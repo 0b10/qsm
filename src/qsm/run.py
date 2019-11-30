@@ -1,5 +1,5 @@
 from subprocess import check_call, CalledProcessError
-from .error import process_error
+from .error import raise_process_error
 
 _shells = {
     # TODO: how would these handle a script path?
@@ -14,7 +14,7 @@ def _run_dom0(command, target, user, shell):
     try:
         check_call(_command, shell=True)
     except CalledProcessError as error:
-        process_error("dom0 shell command: '{}'".format(_command))
+        raise_process_error("dom0 shell command: '{}'".format(_command))
 
 # TODO: --autostart, and refactor tests to use mock.call_args and re
 
@@ -27,7 +27,7 @@ def _run_domU(command, target, user, shell):
     try:
         check_call(_command, shell=True)
     except CalledProcessError as error:
-        process_error("qvm-run command for {}: '{}'".format(target, _command))
+        raise_process_error("qvm-run command for {}: '{}'".format(target, _command))
 
 
 def run(command, target, user, shell="bash"):
