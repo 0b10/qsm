@@ -2,7 +2,7 @@ from textwrap import dedent
 
 
 def install(packages):
-    return dedent("""\
+    return dedent("""python3 -c \'
         import os
         import platform
         from subprocess import call
@@ -16,12 +16,12 @@ def install(packages):
         _dist = platform.dist()[0]
         _command = _commands[_dist]
 
-        call(_command, shell=True)
+        call(_command, shell=True)\'
     """.format(packages))
 
 
 def update():
-    return dedent("""\
+    return dedent("""python3 -c \'
         import os
         import platform
         from subprocess import call
@@ -34,5 +34,5 @@ def update():
         _dist = platform.dist()[0]
         _command = _commands[_dist]
 
-        call(_command, shell=True)
+        call(_command, shell=True)\'
     """)
