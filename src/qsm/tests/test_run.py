@@ -1,6 +1,7 @@
 import pytest
 from qsm.run import run
 from unittest.mock import patch
+import re
 
 
 def test_run_exists():
@@ -12,43 +13,48 @@ def test_run_exists():
 def test_dom0_command_is_executed():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "user", "bash")
-        mock_check_call.assert_called_once_with(
-            "sudo --user=user bash -c ls -l", shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search(
+            "bash -c ls -l", _arg), "command was not executed in dom0"
 
 
 def test_dom0_command_executes_bash():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "user", "bash")
-        mock_check_call.assert_called_once_with(
-            "sudo --user=user bash -c ls -l", shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search(
+            "bash -c ls -l", _arg), "bash was not executed in dom0"
 
 
 def test_dom0_command_executes_zsh():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "user", "zsh")
-        mock_check_call.assert_called_once_with(
-            "sudo --user=user zsh -c ls -l", shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("zsh -c ls -l", _arg), "zsh was not executed in dom0"
 
 
 def test_dom0_command_executes_python():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
-        run("ls -l", "dom0", "user", "python")
-        mock_check_call.assert_called_once_with(
-            "sudo --user=user python ls -l", shell=True)
+        run("script.py", "dom0", "user", "python")
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("python script.py",
+                         _arg), "python was not executed in dom0"
 
 
 def test_dom0_command_is_executed_as_user():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "user", "bash")
-        mock_check_call.assert_called_once_with(
-            "sudo --user=user bash -c ls -l", shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("sudo --user=user",
+                         _arg), "dom0 command was not executed as user"
 
 
 def test_dom0_command_is_executed_as_root():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "root", "bash")
-        mock_check_call.assert_called_once_with(
-            "sudo --user=root bash -c ls -l", shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("sudo --user=root",
+                         _arg), "dom0 command was not executed as root"
 
 # >>> DOMU >>>
 
@@ -56,40 +62,46 @@ def test_dom0_command_is_executed_as_root():
 def test_domU_command_is_executed():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "user", "bash")
-        mock_check_call.assert_called_once_with(
-            'qvm-run --user user --pass-io domU "bash -c ls -l"', shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+domU",
+                         _arg), "command was not executed in domU"
 
 
 def test_domU_command_executes_bash():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "user", "bash")
-        mock_check_call.assert_called_once_with(
-            'qvm-run --user user --pass-io domU "bash -c ls -l"', shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+bash -c ls -l",
+                         _arg), "bash was not executed in odmu"
 
 
 def test_domU_command_executes_zsh():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "user", "zsh")
-        mock_check_call.assert_called_once_with(
-            'qvm-run --user user --pass-io domU "zsh -c ls -l"', shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+zsh -c ls -l",
+                         _arg), "zsh was not executed in domU"
 
 
 def test_domU_command_executes_python():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
-        run("ls -l", "domU", "user", "python")
-        mock_check_call.assert_called_once_with(
-            'qvm-run --user user --pass-io domU "python ls -l"', shell=True)
+        run("script.py", "domU", "user", "python")
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+python script.py",
+                         _arg), "python was not executed in domU"
 
 
 def test_domU_command_is_executed_as_user():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "user", "bash")
-        mock_check_call.assert_called_once_with(
-            'qvm-run --user user --pass-io domU "bash -c ls -l"', shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+--user user",
+                         _arg), "domU command not executed as user"
 
 
 def test_domU_command_is_executed_as_root():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "root", "bash")
-        mock_check_call.assert_called_once_with(
-            'qvm-run --user root --pass-io domU "bash -c ls -l"', shell=True)
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+--user root",
+                         _arg), "domU command not executed as root"

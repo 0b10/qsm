@@ -15,5 +15,5 @@ def test_update_executes_update_script():
 
         # \w\W any char including newline
         assert re.search(
-            "^qvm-run --user root[\w\W]+fedora-template[\w\W]+dnf update -y[\w\W]+$", _arg),
+            "^qvm-run --user root[\w\W]+fedora-template[\w\W]+dnf update -y[\w\W]+$", _arg), \
             "qvm-run as root, and/or update script not executed"
