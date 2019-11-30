@@ -25,7 +25,7 @@ def _run_domU(command, target, user):
 
 def run(command, target, user):
     if target == "dom0":
-        _run_dom0(command, target, user, shell)
+        _run_dom0(command, target, user)
     else:
-        _run_domU(command, target, user, shell)
+        _run_domU(command, target, user)
 

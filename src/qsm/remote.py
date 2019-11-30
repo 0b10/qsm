@@ -3,10 +3,8 @@ from textwrap import dedent
 
 def install(packages):
     return dedent("""python3 -c \'
-        import os
         import platform
         from subprocess import call
-        import sys
 
         _commands = {
             \"fedora\": \"dnf install -y {0}\",
@@ -22,7 +20,6 @@ def install(packages):
 
 def update():
     return dedent("""python3 -c \'
-        import os
         import platform
         from subprocess import call
 
