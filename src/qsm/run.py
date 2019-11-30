@@ -1,5 +1,5 @@
 from subprocess import check_call, CalledProcessError
-from error import process_error
+from .error import process_error
 
 _shells = {
     "bash": "bash -c",
