@@ -15,7 +15,7 @@ def _run_dom0(command, target, user, shell):
     except CalledProcessError as error:
         process_error("dom0 shell command: '{}'".format(_command))
 
-
+# TODO: --autostart, and refactor tests to use mock.call_args and re
 def _run_domU(command, target, user, shell):
     _command = 'qvm-run --user {} --pass-io {} \"{} {}\"'.format(
         user, target, _shells.get(shell, shell), command)

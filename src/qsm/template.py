@@ -1,2 +1,5 @@
+from .run import run
+from .remote import get
+
 def update(target):
-    pass
+    run(command=get("update"), target=target, user="root", shell="bash")
