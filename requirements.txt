@@ -1,1 +1,1 @@
--e .
+dpcontracts==0.6.0
