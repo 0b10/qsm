@@ -1,8 +1,8 @@
-from .run import run_remote
-from .remote import get
+from .run import run
+from .remote import install, update
 
 def update(target):
-    run_remote(command=get("update"), target=target, user="root")
+    run(command=update(), target=target, user="root", shell="python -c")
 
 def install(target, packages):
-    run_remote(command=get("install"), target=target, args=packages, user="root")
+    run(command=install(packages), target=target, user="root", shell="python -c")

@@ -20,7 +20,8 @@ def _run_dom0(command, target, user, shell):
 
 
 def _run_domU(command, target, user, shell):
-    _command = 'qvm-run --user {} --pass-io {} \"{} {}\"'.format(
+    # the command has quotes, it works for all -c parameters that I know of
+    _command = 'qvm-run --user {} --pass-io {} \"{} \'{}\'\"'.format(
         user, target, _shells.get(shell, shell), command)
 
     try:
@@ -35,25 +36,3 @@ def run(command, target, user, shell="bash"):
     else:
         _run_domU(command, target, user, shell)
 
-
-def _quotify(args):
-    return ' '.join("\'{}\'".format(x) for x in args) if args else None
-
-
-def run_remote(command, target, user, args=None):
-    assert type(args) is list or args is None, "args should be a list, or None"
-    # surround with quotations, else None
-    _args = _quotify(args)  # "'arg1', 'arg2'"
-
-    if args:
-        _command = 'qvm-run --user {} --pass-io {} \"python3 -c \'{}\' {}\"'.format(
-            user, target, command, _args) # args doesn't need quotations, _quotify quotes each separately
-    else:
-        _command = 'qvm-run --user {} --pass-io {} \"python3 -c \'{}\'\"'.format(
-            user, target, command)
-
-    try:
-        check_call(_command, shell=True)
-    except CalledProcessError as error:
-        process_error(
-            "qvm-run remote python script for {}: '{}'".format(target, _command))
