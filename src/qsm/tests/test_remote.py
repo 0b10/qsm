@@ -2,7 +2,6 @@ import pytest
 from qsm.remote import get
 from unittest.mock import patch
 import re
-from dpcontracts import PreconditionError
 
 
 def test_get_exists():
@@ -19,7 +18,7 @@ def test_get_accepts_valid_target():
 
 
 def test_get_rejects_invalid_target():
-    with pytest.raises(PreconditionError):
+    with pytest.raises(AssertionError):
         get("jahdslkjhd")
 
 # >>> UPDATE >>>

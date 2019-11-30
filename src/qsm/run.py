@@ -1,6 +1,5 @@
 from subprocess import check_call, CalledProcessError
 from .error import process_error
-from dpcontracts import require
 
 _shells = {
     # TODO: how would these handle a script path?
@@ -41,8 +40,8 @@ def _quotify(args):
     return ' '.join("\'{}\'".format(x) for x in args) if args else None
 
 
-@require("args should be a list, or None", lambda args: type(args.args) is list or args.args is None)
 def run_remote(command, target, user, args=None):
+    assert type(args) is list or args is None, "args should be a list, or None"
     # surround with quotations, else None
     _args = _quotify(args)  # "'arg1', 'arg2'"
 
