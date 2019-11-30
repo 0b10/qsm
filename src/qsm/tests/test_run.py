@@ -1,5 +1,5 @@
 import pytest
-from qsm.run import run
+from qsm.run import run, run_remote
 from unittest.mock import patch
 import re
 
@@ -105,3 +105,44 @@ def test_domU_command_is_executed_as_root():
         _arg = mock_check_call.call_args[0][0]
         assert re.search("^qvm-run[\w\W]+--user root",
                          _arg), "domU command not executed as root"
+
+# >>> run_remote >>>
+
+
+def test_run_remote_executes_python():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        run_remote("a = 1", "domU", "user")
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+python3 -c \'a = 1\'",
+                         _arg), "python inline script was not executed in domU"
+
+
+def test_run_remote_executes_python_as_root():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        run_remote("a = 1", "domU", "root")
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+--user root",
+                         _arg), "python inline script was not executed as root"
+
+
+def test_run_remote_executes_python_as_user():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        run_remote("a = 1", "domU", "user")
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+--user user",
+                         _arg), "python inline script was not executed as user"
+
+def test_run_remote_targets_given_domU():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        run_remote("a = 1", "domU", "user")
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+domU",
+                         _arg), "python inline script was not executed as user"
+
+
+def test_run_remote_executes_script_with_args():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        run_remote("a = 1", "domU", "user", ["some string", "argB"])
+        _arg = mock_check_call.call_args[0][0]
+        assert re.search("^qvm-run[\w\W]+\'some string\' \'argB\'",
+                         _arg), "python inline script did not receive args"

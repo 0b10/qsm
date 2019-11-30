@@ -2,7 +2,8 @@ from dpcontracts import require
 import os
 
 _targets = [
-    "update"
+    "install",
+    "update",
 ]
 
 @require("Invalid remote script; target doesn't exist", lambda args: args.target in _targets)
