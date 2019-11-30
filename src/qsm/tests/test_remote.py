@@ -1,6 +1,4 @@
-import pytest
 from qsm.remote import update, install
-from unittest.mock import patch
 import re
 
 

@@ -1,8 +1,10 @@
 from .run import run
-from .remote import install, update
+from .remote import install_script, update_script
+
 
 def update(target):
-    run(command=update(), target=target, user="root")
+    run(command=update_script(), target=target, user="root")
+
 
 def install(target, packages):
-    run(command=install(packages), target=target, user="root")
+    run(command=install_script(packages), target=target, user="root")
