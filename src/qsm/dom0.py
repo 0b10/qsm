@@ -118,7 +118,7 @@ def install(packages):
 def uninstall(packages):
     print_header("uninstalling packages from dom0")
 
-    _command = "qubes-dom0-update -y {}".format(
+    _command = "qubes-dom0-update --action=remove -y {}".format(
         parse_packages(packages))
     run(command=_command, target="dom0", user="root")
 
