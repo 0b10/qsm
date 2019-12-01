@@ -1,4 +1,4 @@
-from qsm.template import update, install, remove
+from qsm.vm import update, install, remove
 from unittest.mock import patch
 import re
 

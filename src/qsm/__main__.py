@@ -1,7 +1,7 @@
 import argparse
 import sys
 from qsm import __version__
-from qsm.template import update
+from qsm.vm import update
 
 
 def get_parser():
