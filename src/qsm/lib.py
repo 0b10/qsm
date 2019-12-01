@@ -29,3 +29,12 @@ def start(target):
     except CalledProcessError:
         raise_process_error("- unable to start vm")
     print("{} started".format(target))
+
+
+def stop(target, timeout=120):
+    print("stopping {}...".format(target))
+    try:
+        print("qvm-shutdown --wait --timeout {} {}".format(timeout, target))
+    except CalledProcessError:
+        raise_process_error("- unable to stop vm")
+    print("{} stopped".format(target))
