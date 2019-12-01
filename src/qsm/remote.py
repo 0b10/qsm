@@ -56,3 +56,28 @@ def remove(packages):
 
         call(_command, shell=True)\'
     """.format(packages))
+
+# >>> GIT >>>
+
+
+def verify_repo_store(store_dir="/rw/repo_store", user="user", group="user", mode=750):
+    return dedent("""\
+        python3 -W ignore::DeprecationWarning -c \'
+        from os import makedirs
+        from os.path import join, isdir
+        from shutil import chown
+
+        _store_dir = \"{0}\"
+        _dist = join(_store_dir, "dist")
+        _user = \"{1}\"
+        _group = \"{2}\"
+        _mode = 0o{3}\
+
+        if isdir(_store_dir):
+            print("repo store exists @ {0}")
+        else:
+            print("repo store doesn\\'t exist, creating @ {0}")
+            makedirs(_dist, _mode, exist_ok=True)
+            chown(_store_dir, _user, _group)
+            chown(_dist, _user, _group)\'
+    """.format(store_dir, user, group, mode))
