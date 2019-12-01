@@ -1,7 +1,8 @@
 from subprocess import check_call, CalledProcessError
 from qsm.error import raise_process_error
-from qsm.lib import print_header, print_sub
+from qsm.lib import print_header, print_sub, parse_packages
 from qsm.constants import GREEN, WHITE, RED
+from run import run
 
 
 def create(name, label, options=None):
@@ -94,3 +95,31 @@ def disable_services(target, services):
             print_sub("{}".format(_service))
     except CalledProcessError:
         raise_process_error("- unable to disable service")
+
+
+def update():
+    print_header("updating dom0")
+
+    run(command="sudo qubes-dom0-update -y", target="dom0", user="root")
+
+    print_sub("dom0 updated")
+
+
+def install(packages):
+    print_header("installing packages on dom0")
+
+    _command = "sudo qubes-dom0-update -y \'{}\'".format(
+        parse_packages(packages))
+    run(command=_command, target="dom0", user="root")
+
+    print_sub("installed packages on dom0")
+
+
+def uninstall(packages):
+    print_header("uninstalling packages from dom0")
+
+    _command = "sudo qubes-dom0-update -y \'{}\'".format(
+        parse_packages(packages))
+    run(command=_command, target="dom0", user="root")
+
+    print_sub("uninstalled packages from dom0")

@@ -8,3 +8,7 @@ def print_header(message):
 def print_sub(message, failed=False):
     _colour = RED if failed else GREEN
     print(_colour + ">>> " + message + WHITE)
+
+
+def parse_packages(packages):
+    return ' '.join(packages) if type(packages) is list else packages
