@@ -1,5 +1,6 @@
 from subprocess import check_call, CalledProcessError
-from .error import raise_process_error
+from qsm.error import raise_process_error
+from qsm.lib import print_header
 
 
 def _run_dom0(command, target, user):
@@ -20,10 +21,13 @@ def _run_domU(command, target, user):
     try:
         check_call(_command, shell=True)
     except CalledProcessError:
-        raise_process_error("qvm-run command for {}: '{}'".format(target, _command))
+        raise_process_error(
+            "qvm-run command for {}: '{}'".format(target, _command))
 
 
 def run(command, target, user):
+    print_header("running command on {} as {}".format(target, user))
+
     if target == "dom0":
         _run_dom0(command, target, user)
     else:
