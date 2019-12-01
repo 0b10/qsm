@@ -20,3 +20,12 @@ def set_prefs(target, options):
                                                           _option, _value), shell=True)
     except CalledProcessError:
         raise_process_error("- cannot set vm preferences")
+
+
+def start(target):
+    print("starting {}...".format(target))
+    try:
+        check_call("qvm-start --skip-if-running {}".format(target), shell=True)
+    except CalledProcessError:
+        raise_process_error("- unable to start vm")
+    print("{} started".format(target))
