@@ -7,4 +7,5 @@ def update(target):
 
 
 def install(target, packages):
-    run(command=install_script(packages), target=target, user="root")
+    _packages = ' '.join(packages) if type(packages) is list else packages
+    run(command=install_script(_packages), target=target, user="root")

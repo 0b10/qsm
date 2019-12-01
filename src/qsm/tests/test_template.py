@@ -20,7 +20,7 @@ def test_update_executes_update_script():
 
 def test_install_executes_install_script():
     with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
-        install("fedora-template", ["vim nano", "another_arg"])
+        install("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
         # \w\W any char including newline

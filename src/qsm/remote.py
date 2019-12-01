@@ -2,14 +2,15 @@ from textwrap import dedent
 
 
 def install(packages):
-    return dedent("""python3 -c \'
+    return dedent("""\
+        python3 -c \'
         import platform
         from subprocess import call
 
-        _commands = {
+        _commands = {{
             \"fedora\": \"dnf install -y {0}\",
             \"debian\": \"apt-get install -y {0}\"
-        }
+        }}
 
         _dist = platform.dist()[0]
         _command = _commands[_dist]
@@ -19,7 +20,8 @@ def install(packages):
 
 
 def update():
-    return dedent("""python3 -c \'
+    return dedent("""\
+        python3 -c \'
         import platform
         from subprocess import call
 
