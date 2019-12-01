@@ -108,18 +108,18 @@ def update():
 def install(packages):
     print_header("installing packages on dom0")
 
-    _command = "qubes-dom0-update -y \'{}\'".format(
+    _command = "qubes-dom0-update -y {}".format(
         parse_packages(packages))
     run(command=_command, target="dom0", user="root")
 
-    print_sub("installed packages on dom0")
+    print_sub("dom0 package installation finished")
 
 
 def uninstall(packages):
     print_header("uninstalling packages from dom0")
 
-    _command = "qubes-dom0-update -y \'{}\'".format(
+    _command = "qubes-dom0-update -y {}".format(
         parse_packages(packages))
     run(command=_command, target="dom0", user="root")
 
-    print_sub("uninstalled packages from dom0")
+    print_sub("dom0 package uninstallation finished")
