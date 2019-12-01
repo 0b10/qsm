@@ -1,9 +1,10 @@
 from textwrap import dedent
 
 
+# FIXME: platform.dist() has been moved to an external package in 3.7
 def install(packages):
     return dedent("""\
-        python3 -c \'
+        python3 -W ignore::DeprecationWarning -c \'
         import platform
         from subprocess import call
 
@@ -19,9 +20,10 @@ def install(packages):
     """.format(packages))
 
 
+# FIXME: platform.dist() has been moved to an external package in 3.7
 def update():
     return dedent("""\
-        python3 -c \'
+        python3 -W ignore::DeprecationWarning -c \'
         import platform
         from subprocess import call
 
