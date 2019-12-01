@@ -6,7 +6,8 @@ import re
 def test_run_exists():
     assert run is not None
 
-# >>> DOM0 >>>
+# >>> RUN >>>
+# ~~~ DOM0 ~~~
 
 
 def test_dom0_command_is_executed():
@@ -32,7 +33,7 @@ def test_dom0_command_is_executed_as_root():
         assert re.search(r"sudo --user=root",
                          _arg), "dom0 command was not executed as root"
 
-# >>> DOMU >>>
+# ~~~ DOMU ~~~
 
 
 def test_domU_command_is_executed():
