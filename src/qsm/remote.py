@@ -9,8 +9,8 @@ def install(packages):
         from subprocess import call
 
         _commands = {{
-            \"fedora\": \"dnf install -y {0}\",
-            \"debian\": \"apt-get update && apt-get install -y {0}\"
+            \\"fedora\\": \\"dnf install -y {0}\\",
+            \\"debian\\": \\"apt-get update && apt-get install -y {0}\\"
         }}
 
         _dist = platform.dist()[0]
@@ -28,8 +28,8 @@ def update():
         from subprocess import call
 
         _commands = {
-            \"fedora\": \"dnf update -y\",
-            \"debian\": \"apt-get update && apt-get upgrade -y\"
+            \\"fedora\\": \\"dnf update -y\\",
+            \\"debian\\": \\"apt-get update && apt-get upgrade -y\\"
         }
 
         _dist = platform.dist()[0]
@@ -47,8 +47,8 @@ def remove(packages):
         from subprocess import call
 
         _commands = {{
-            \"fedora\": \"dnf remove -y {0}\",
-            \"debian\": \"apt-get remove -y {0}\"
+            \\"fedora\\": \\"dnf remove -y {0}\\",
+            \\"debian\\": \\"apt-get remove -y {0}\\"
         }}
 
         _dist = platform.dist()[0]
@@ -67,11 +67,11 @@ def verify_repo_store(store_dir, user="user", group="user", mode=750):
         from os.path import join, isdir
         from shutil import chown
 
-        _store_dir = \"{0}\"
+        _store_dir = \\"{0}\\"
         _dist = join(_store_dir, "dist")
-        _user = \"{1}\"
-        _group = \"{2}\"
-        _mode = 0o{3}\
+        _user = \\"{1}\\"
+        _group = \\"{2}\\"
+        _mode = 0o{3}
 
         if isdir(_store_dir):
             print("repo store exists @ {0}")
@@ -92,9 +92,9 @@ def git_pull(repo, repo_name, store_dir):
         from os.path import join
         import sys
 
-        _repo = \"{0}\"
-        _store_dir = \"{2}\"
-        _repo_name = \"{1}\"
+        _repo = \\"{0}\\"
+        _store_dir = \\"{2}\\"
+        _repo_name = \\"{1}\\"
         _local_repo = join(_store_dir, _repo_name)
         _clone = "git clone {0} {1}"
 
