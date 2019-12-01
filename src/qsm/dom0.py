@@ -100,7 +100,7 @@ def disable_services(target, services):
 def update():
     print_header("updating dom0")
 
-    run(command="sudo qubes-dom0-update -y", target="dom0", user="root")
+    run(command="qubes-dom0-update -y", target="dom0", user="root")
 
     print_sub("dom0 update finished")
 
@@ -108,7 +108,7 @@ def update():
 def install(packages):
     print_header("installing packages on dom0")
 
-    _command = "sudo qubes-dom0-update -y \'{}\'".format(
+    _command = "qubes-dom0-update -y \'{}\'".format(
         parse_packages(packages))
     run(command=_command, target="dom0", user="root")
 
@@ -118,7 +118,7 @@ def install(packages):
 def uninstall(packages):
     print_header("uninstalling packages from dom0")
 
-    _command = "sudo qubes-dom0-update -y \'{}\'".format(
+    _command = "qubes-dom0-update -y \'{}\'".format(
         parse_packages(packages))
     run(command=_command, target="dom0", user="root")
 
