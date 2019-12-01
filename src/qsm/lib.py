@@ -40,8 +40,6 @@ def _run_domU(command, target, user, colour=36, err_colour=36):
 
 
 def run(command, target, user):
-    print_header("running command on {} as {}".format(target, user))
-
     if target == "dom0":
         _run_dom0(command, target, user)
     else:
