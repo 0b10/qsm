@@ -26,10 +26,11 @@ def _run_dom0(command, target, user):
 # TODO: --autostart, and refactor tests to use mock.call_args and re
 
 
-def _run_domU(command, target, user):
+def _run_domU(command, target, user, colour=36, err_colour=36):
+    # FIXME: qvm-run --pass-io seems to only pass to stderr, set both to the same value for now
     # the command has quotes, it works for all -c parameters that I know of
-    _command = 'qvm-run --user {} --pass-io {} \"{}\"'.format(
-        user, target, command)
+    _command = 'qvm-run --autostart --user {} --colour-output {} --colour-stderr {} --pass-io {} \"{}\"'.format(
+        user, colour, err_colour, target, command)
 
     try:
         check_call(_command, shell=True)
