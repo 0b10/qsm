@@ -34,7 +34,17 @@ def start(target):
 def stop(target, timeout=120):
     print("stopping {}...".format(target))
     try:
-        print("qvm-shutdown --wait --timeout {} {}".format(timeout, target))
+        check_call(
+            "qvm-shutdown --wait --timeout {} {}".format(timeout, target), shell=True)
     except CalledProcessError:
         raise_process_error("- unable to stop vm")
     print("{} stopped".format(target))
+
+
+def remove(target):
+    print("removing {}...".format(target))
+    try:
+        check_call("qvm-remove --force {}".format(target), shell=True)
+    except CalledProcessError:
+        raise_process_error("- unable to remove vm")
+    print("{} removed".format(target))
