@@ -1,10 +1,10 @@
-from qsm.constants import GREEN, WHITE, RED
+from qsm.constants import GREEN, WHITE, RED, PURPLE
 from subprocess import check_call, CalledProcessError
 from qsm.error import raise_process_error
 
 
 def print_header(message):
-    print(WHITE + message + "...")
+    print(PURPLE + "+ " + message + "..." + WHITE)
 
 
 def print_sub(message, failed=False):
