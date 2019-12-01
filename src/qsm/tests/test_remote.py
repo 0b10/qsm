@@ -21,5 +21,5 @@ def test_install_returns_a_string():
 
 
 def test_install_returns_an_expected_value():
-    assert re.search("dnf install -y", install()
+    assert re.search("dnf install -y", install("vim")
                      ), "did not return an install script"

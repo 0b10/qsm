@@ -1,7 +1,7 @@
 from textwrap import dedent
 
 
-def install_script(packages):
+def install(packages):
     return dedent("""python3 -c \'
         import platform
         from subprocess import call
@@ -18,7 +18,7 @@ def install_script(packages):
     """.format(packages))
 
 
-def update_script():
+def update():
     return dedent("""python3 -c \'
         import platform
         from subprocess import call

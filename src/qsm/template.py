@@ -1,5 +1,5 @@
 from .run import run
-from .remote import install_script, update_script
+from .remote import install as install_script, update as update_script
 
 
 def update(target):
