@@ -102,7 +102,7 @@ def update():
 
     run(command="sudo qubes-dom0-update -y", target="dom0", user="root")
 
-    print_sub("dom0 updated")
+    print_sub("dom0 update finished")
 
 
 def install(packages):

@@ -1,3 +1,6 @@
+from .lib import print_sub
+
+
 class QsmProcessError(Exception):
     """Raised when a process returns a non-zero exit status
     """
@@ -10,5 +13,5 @@ def raise_process_error(append=None):
     if append is not None:
         message += " {}".format(append)
 
-    print(message)
+    print_sub(message, failed=True)
     raise QsmProcessError
