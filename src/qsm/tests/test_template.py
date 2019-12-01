@@ -10,7 +10,7 @@ def test_update_exists():
 
 
 def test_update_uses_qvm_run():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         update("fedora-template")
         _arg = mock_check_call.call_args[0][0]
 
@@ -19,7 +19,7 @@ def test_update_uses_qvm_run():
 
 
 def test_update_executes_dnf_update():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         update("fedora-template")
         _arg = mock_check_call.call_args[0][0]
 
@@ -29,7 +29,7 @@ def test_update_executes_dnf_update():
 
 
 def test_update_executes_as_root():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         update("fedora-template")
         _arg = mock_check_call.call_args[0][0]
 
@@ -39,7 +39,7 @@ def test_update_executes_as_root():
 
 
 def test_update_excutes_on_correct_target():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         update("fedora-template")
         _arg = mock_check_call.call_args[0][0]
 
@@ -50,7 +50,7 @@ def test_update_excutes_on_correct_target():
 
 
 def test_install_uses_qvm_run():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         install("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -60,7 +60,7 @@ def test_install_uses_qvm_run():
 
 
 def test_install_executes_dnf_install():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         install("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -70,7 +70,7 @@ def test_install_executes_dnf_install():
 
 
 def test_install_executes_as_root():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         install("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -80,7 +80,7 @@ def test_install_executes_as_root():
 
 
 def test_install_excutes_on_correct_target():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         install("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -92,7 +92,7 @@ def test_install_excutes_on_correct_target():
 
 
 def test_uninstall_uses_qvm_run():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         uninstall("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -102,7 +102,7 @@ def test_uninstall_uses_qvm_run():
 
 
 def test_uninstall_executes_dnf_remove():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         uninstall("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -112,7 +112,7 @@ def test_uninstall_executes_dnf_remove():
 
 
 def test_uninstall_executes_as_root():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         uninstall("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 
@@ -122,7 +122,7 @@ def test_uninstall_executes_as_root():
 
 
 def test_uninstall_excutes_on_correct_target():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         uninstall("fedora-template", ["vim",  "nano"])
         _arg = mock_check_call.call_args[0][0]
 

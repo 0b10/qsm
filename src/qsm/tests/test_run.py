@@ -1,4 +1,4 @@
-from qsm.run import run
+from qsm.lib import run
 from unittest.mock import patch
 import re
 
@@ -10,7 +10,7 @@ def test_run_exists():
 
 
 def test_dom0_command_is_executed():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "user")
         _arg = mock_check_call.call_args[0][0]
         assert re.search(
@@ -18,7 +18,7 @@ def test_dom0_command_is_executed():
 
 
 def test_dom0_command_is_executed_as_user():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "user")
         _arg = mock_check_call.call_args[0][0]
         assert re.search(r"sudo --user=user",
@@ -26,7 +26,7 @@ def test_dom0_command_is_executed_as_user():
 
 
 def test_dom0_command_is_executed_as_root():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "dom0", "root")
         _arg = mock_check_call.call_args[0][0]
         assert re.search(r"sudo --user=root",
@@ -36,7 +36,7 @@ def test_dom0_command_is_executed_as_root():
 
 
 def test_domU_command_is_executed():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "user")
         _arg = mock_check_call.call_args[0][0]
         assert re.search(r"^qvm-run[\w\W]+domU",
@@ -44,7 +44,7 @@ def test_domU_command_is_executed():
 
 
 def test_domU_command_is_executed_as_user():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "user")
         _arg = mock_check_call.call_args[0][0]
         assert re.search(r"^qvm-run[\w\W]+--user user",
@@ -52,7 +52,7 @@ def test_domU_command_is_executed_as_user():
 
 
 def test_domU_command_is_executed_as_root():
-    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+    with patch("qsm.lib.check_call", return_value=0, autospec=True) as mock_check_call:
         run("ls -l", "domU", "root")
         _arg = mock_check_call.call_args[0][0]
         assert re.search(r"^qvm-run[\w\W]+--user root",

@@ -1,4 +1,4 @@
-from qsm.run import run
+from qsm.lib import run
 from qsm.remote import install as install_script, update as update_script, remove as remove_script
 from qsm.lib import print_header, print_sub, parse_packages
 
