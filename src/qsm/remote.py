@@ -60,9 +60,9 @@ def remove(packages):
 # >>> GIT >>>
 
 
-def verify_repo_store(store_dir="/rw/repo_store", user="user", group="user", mode=750):
+def verify_repo_store(store_dir, user="user", group="user", mode=750):
     return dedent("""\
-        python3 -W ignore::DeprecationWarning -c \'
+        python3 -c \'
         from os import makedirs
         from os.path import join, isdir
         from shutil import chown
@@ -81,3 +81,32 @@ def verify_repo_store(store_dir="/rw/repo_store", user="user", group="user", mod
             chown(_store_dir, _user, _group)
             chown(_dist, _user, _group)\'
     """.format(store_dir, user, group, mode))
+
+
+# this assumes that the repo store exists, it will fail otherwise. use verify_repo_store first
+def git_pull(repo, repo_name, store_dir):
+    return dedent("""\
+        python3 -c \'
+        from subprocess import call
+        from os import chdir
+        from os.path import join
+        import sys
+
+        _repo = \"{0}\"
+        _store_dir = \"{2}\"
+        _repo_name = \"{1}\"
+        _local_repo = join(_store_dir, _repo_name)
+        _clone = "git clone {0} {1}"
+
+        try:
+            chdir(_local_repo)
+            call("git status 2&>1 > /dev/null", shell=True)
+        except FileNotFoundError:
+            print("repo doesn't exist: {1}")
+            chdir(_store_dir)
+            sys.exit(call(_clone, shell=True))
+
+        print("pulling updates for: {1}")
+        chdir(_local_repo)
+        sys.exit(call("git pull", shell=True))\'
+    """.format(repo, repo_name, store_dir))
