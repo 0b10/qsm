@@ -2,7 +2,7 @@ from subprocess import check_call, CalledProcessError
 from qsm.error import raise_process_error
 from qsm.lib import print_header, print_sub, parse_packages
 from qsm.constants import GREEN, WHITE, RED
-from run import run
+from qsm.lib import run
 
 
 def create(name, label, options=None):
