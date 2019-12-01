@@ -1,5 +1,5 @@
 from .run import run
-from .remote import install as install_script, update as update_script
+from .remote import install as install_script, update as update_script, remove as remove_script
 
 
 def update(target):
@@ -9,3 +9,8 @@ def update(target):
 def install(target, packages):
     _packages = ' '.join(packages) if type(packages) is list else packages
     run(command=install_script(_packages), target=target, user="root")
+
+
+def remove(target, packages):
+    _packages = ' '.join(packages) if type(packages) is list else packages
+    run(command=remove_script(_packages), target=target, user="root")

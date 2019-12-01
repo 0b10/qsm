@@ -1,4 +1,4 @@
-from qsm.template import update, install
+from qsm.template import update, install, remove
 from unittest.mock import patch
 import re
 
@@ -86,3 +86,45 @@ def test_install_excutes_on_correct_target():
 
         assert re.search(
             r" fedora-template ", _arg), "install not executed on the correct target"
+
+
+# >>> REMOVE >>>
+
+
+def test_remove_uses_qvm_run():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        remove("fedora-template", ["vim",  "nano"])
+        _arg = mock_check_call.call_args[0][0]
+
+        # \w\W any char including newline
+        assert re.search(
+            r"^qvm-run ", _arg), "qvm-run was not used"
+
+
+def test_remove_executes_dnf_remove():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        remove("fedora-template", ["vim",  "nano"])
+        _arg = mock_check_call.call_args[0][0]
+
+        # \w\W any char including newline
+        assert re.search(
+            r"dnf remove -y vim nano", _arg), "dnf is not executed"
+
+
+def test_remove_executes_as_root():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        remove("fedora-template", ["vim",  "nano"])
+        _arg = mock_check_call.call_args[0][0]
+
+        # \w\W any char including newline
+        assert re.search(
+            r" --user root ", _arg), "remove was not run as root"
+
+
+def test_remove_excutes_on_correct_target():
+    with patch("qsm.run.check_call", return_value=0, autospec=True) as mock_check_call:
+        remove("fedora-template", ["vim",  "nano"])
+        _arg = mock_check_call.call_args[0][0]
+
+        assert re.search(
+            r" fedora-template ", _arg), "remove not executed on the correct target"
