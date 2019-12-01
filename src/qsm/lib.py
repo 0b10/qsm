@@ -17,7 +17,7 @@ def parse_packages(packages):
 
 
 def _run_dom0(command, target, user):
-    _command = 'sudo --user={} {}'.format(user, command)
+    _command = 'sudo --user={} \'{}\''.format(user, command)
     try:
         check_call(_command, shell=True)
     except CalledProcessError:
