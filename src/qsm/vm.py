@@ -8,7 +8,7 @@ def update(target):
 
     run(command=update_script(), target=target, user="root")
 
-    print_sub("{} updated".format(target))
+    print_sub("{} update finished".format(target))
 
 
 def install(target, packages):
@@ -17,7 +17,7 @@ def install(target, packages):
     _packages = parse_packages(packages)
     run(command=install_script(_packages), target=target, user="root")
 
-    print_sub("installed packages on {}".format(target))
+    print_sub("{} package installation finished".format(target))
 
 
 def uninstall(target, packages):
@@ -26,4 +26,4 @@ def uninstall(target, packages):
     _packages = parse_packages(packages)
     run(command=remove_script(_packages), target=target, user="root")
 
-    print_sub("removed packages from {}".format(target))
+    print_sub("{} package uninstallation finished".format(target))
