@@ -77,6 +77,28 @@ def clone(source, target):
     try:
         check_call("qvm-clone {} {}".format(source, target), shell=True)
     except CalledProcessError:
-        raise_process_error("- unable to remove vm")
+        raise_process_error("- unable to clone vm")
 
     print_sub("{} created".format(target))
+
+
+def enable_services(target, services):
+    print(GREEN+"enabling"+WHITE+" services on {}...".format(target))
+
+    try:
+        for _service in services:
+            check_call("qvm-service --enable {}".format(_service), shell=True)
+            print_sub("{}".format(_service))
+    except CalledProcessError:
+        raise_process_error("- unable to enable service")
+
+
+def disable_services(target, services):
+    print(RED+"disabling"+WHITE+" services on {}...".format(target))
+
+    try:
+        for _service in services:
+            check_call("qvm-service --disable {}".format(_service), shell=True)
+            print_sub("{}".format(_service))
+    except CalledProcessError:
+        raise_process_error("- unable to disable service")
