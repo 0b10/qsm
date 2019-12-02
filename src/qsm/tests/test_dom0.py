@@ -232,8 +232,8 @@ def test_clone_executes_if_vm_exists():
     with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
         # run returns None for successful run
         with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
-            dom0.stop("fedora-template")
-            assert mock_run.called, "run was not called, stop not executed"
+            dom0.clone("fedora-template", "cloned-vm")
+            assert mock_run.called, "run was not called, clone not executed"
 
 
 def test_clone_throws_if_vm_doesnt_exist():
@@ -242,4 +242,49 @@ def test_clone_throws_if_vm_doesnt_exist():
         # run returns None for successful run
         with patch("qsm.dom0.run", return_value=None, autospec=True):
             with pytest.raises(lib.QsmPreconditionError):
-                dom0.stop("fedora-template")
+                dom0.clone("fedora-template", "cloned-vm")
+
+
+# >>> enable_services() >>>
+
+
+def test_enable_services_executes_if_vm_exists():
+    # exists_or_throws returns True when vm exists
+    with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+        # run returns None for successful run
+        with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
+            dom0.enable_services(
+                "fedora-template", ["service-one", "service-two"])
+            assert mock_run.called, "run was not called, enable_services not executed"
+
+
+def test_enable_services_throws_if_vm_doesnt_exist():
+    # exists_or_throws throws when vm doesn't exist
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
+        # run returns None for successful run
+        with patch("qsm.dom0.run", return_value=None, autospec=True):
+            with pytest.raises(lib.QsmPreconditionError):
+                dom0.enable_services(
+                    "fedora-template", ["service-one", "service-two"])
+
+# >>> disable_services() >>>
+
+
+def test_disable_services_executes_if_vm_exists():
+    # exists_or_throws returns True when vm exists
+    with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+        # run returns None for successful run
+        with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
+            dom0.disable_services(
+                "fedora-template", ["service-one", "service-two"])
+            assert mock_run.called, "run was not called, disable_services not executed"
+
+
+def test_disable_services_throws_if_vm_doesnt_exist():
+    # exists_or_throws throws when vm doesn't exist
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
+        # run returns None for successful run
+        with patch("qsm.dom0.run", return_value=None, autospec=True):
+            with pytest.raises(lib.QsmPreconditionError):
+                dom0.disable_services(
+                    "fedora-template", ["service-one", "service-two"])
