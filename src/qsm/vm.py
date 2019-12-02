@@ -20,37 +20,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from qsm import lib
-from qsm.remote import install as install_script, update as update_script, remove as remove_script
-from qsm.lib import print_header, print_sub, parse_packages
 import re
+from qsm import lib
+from qsm import remote
 from qsm import constants
 
 
 def update(target):
-    print_header("updating {}".format(target))
+    lib.print_header("updating {}".format(target))
 
-    lib.run(command=update_script(), target=target, user="root")
+    lib.run(command=remote.update(), target=target, user="root")
 
-    print_sub("{} update finished".format(target))
+    lib.print_sub("{} update finished".format(target))
 
 
 def install(target, packages):
-    print_header("installing packages on {}".format(target))
+    lib.print_header("installing packages on {}".format(target))
 
-    _packages = parse_packages(packages)
-    lib.run(command=install_script(_packages), target=target, user="root")
+    _packages = lib.parse_packages(packages)
+    lib.run(command=remote.install(_packages), target=target, user="root")
 
-    print_sub("{} package installation finished".format(target))
+    lib.print_sub("{} package installation finished".format(target))
 
 
 def uninstall(target, packages):
-    print_header("removing packages from {}".format(target))
+    lib.print_header("removing packages from {}".format(target))
 
-    _packages = parse_packages(packages)
-    lib.run(command=remove_script(_packages), target=target, user="root")
+    _packages = lib.parse_packages(packages)
+    lib.run(command=remote.remove(_packages), target=target, user="root")
 
-    print_sub("{} package uninstallation finished".format(target))
+    lib.print_sub("{} package uninstallation finished".format(target))
 
 
 class VmPrefsBuilder:
