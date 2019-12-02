@@ -237,14 +237,14 @@ def _merge_prefs(prefs, label):
     return {**prefs, **_label} if prefs else _label
 
 
-def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None):
+def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None, exists_ok=True):
     assert type(
         prefs) is dict or prefs is None, "prefs should be a dict, or None"
 
     _prefs = prefs
 
     if clone_from:
-        clone(clone_from, name)
+        clone(clone_from, name, exists_ok=exists_ok)
         _prefs = _merge_prefs(prefs, label)  # set label
     else:
         create(name, label)
