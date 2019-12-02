@@ -244,10 +244,10 @@ def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None
     _prefs = prefs
 
     if clone_from:
-        clone(clone_from, name, exists_ok=exists_ok)
+        clone(clone_from, name)
         _prefs = _merge_prefs(prefs, label)  # set label
     else:
-        create(name, label)
+        create(name, label, exists_ok=True)
 
     if _prefs:
         vm_prefs(name, _prefs)
