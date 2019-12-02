@@ -46,7 +46,14 @@ def run(command, target, user):
 
 
 class QsmProcessError(Exception):
-    """Raised when a process returns a non-zero exit status
+    """
+    Raised when a process returns a non-zero exit status.
+    """
+    pass
+
+class QsmPreconditionError(Exception):
+    """
+    Raised when a precondition is not met.
     """
     pass
 

@@ -1,6 +1,14 @@
-from qsm.lib import print_header, print_sub, parse_packages
+from qsm.lib import print_header, print_sub, parse_packages, run, QsmPreconditionError, QsmProcessError
 from qsm.constants import GREEN, WHITE, RED
-from qsm.lib import run
+
+
+def exists(target):
+    _command = "qvm-check --quiet {} > 2&>1 >/dev/null"
+    try:
+        run(command=_command, target="dom0", user="root")
+    except QsmProcessError:
+        return False
+    return True
 
 
 def create(name, label, options=None):
@@ -15,6 +23,11 @@ def create(name, label, options=None):
 
 def vm_prefs(target, prefs):
     print_header("setting prefs for {}".format(target))
+
+    if not exists(target):
+        print_sub(
+            "{} doesn't exist, you need to create it before setting preferences".format(target))
+        raise QsmPreconditionError
 
     for _key, _value in prefs.items():
         _command = "qvm-prefs -s {} {} \'{}\'".format(target, _key, _value)
