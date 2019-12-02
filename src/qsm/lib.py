@@ -123,6 +123,16 @@ def _is_meaningful_string(value):
     return isinstance(value, str) and value
 
 
+def is_ipv4(value):
+    if _is_meaningful_string(value):
+        try:
+            _seg_bools = [int and int(x) >= 0 and int(x) <= 255 for x in value.split(".")]
+        except ValueError:
+            return False
+        return len(_seg_bools) == 4 and all(_seg_bools)
+    return False
+
+
 class VmPrefsBuilder:
     def __init__(self):
         self._prefs = dict()
