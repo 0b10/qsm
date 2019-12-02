@@ -8,7 +8,7 @@ from qsm.constants import (GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND, QVM_CH
 def exists(target):
     _command = "qvm-check --quiet {} 2>/dev/null".format(target)
     try:
-        run(command=_command, target="dom0", user="root")
+        run(command=_command, target="dom0", user="root", show_message=False)
     except QsmProcessError as error:
         if error.returncode != QVM_CHECK_EXISTS_NOT_FOUND:  # is not exit code 2
             # some other error occurred
@@ -45,7 +45,7 @@ def is_running(target):
     _command = "qvm-check --quiet --running {} 2>/dev/null".format(
         target)
     try:
-        run(command=_command, target="dom0", user="root")
+        run(command=_command, target="dom0", user="root", show_message=False)
     except QsmProcessError as error:
         if error.returncode != QVM_CHECK_IS_NOT_RUNNING:  # is not exit code 1
             # some other error occurred
