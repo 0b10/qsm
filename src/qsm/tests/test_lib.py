@@ -117,3 +117,15 @@ def test_is_meaningful_string_rejects_empty_string():
 
 def test_is_meaningful_string_happy_path_fuzz():
     assert lib.is_meaningful_string("text"), "should be accepted"
+
+
+# ~~~ is_mac() ~~~
+
+
+def test_is_mac_accepts_mac():
+    assert lib.is_mac("00:01:36:12:e6:ff"), "should accept a mac address"
+
+
+@hypothesis.given(s.text())
+def test_is_mac_rejects_non_mac(text):
+    assert not lib.is_mac(text), "should reject non-macs"

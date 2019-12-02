@@ -36,3 +36,4 @@ LABELS = ["red", "orange", "yellow", "green",
 VIRT_MODES = ["pvh", "hvm", "pv"]
 
 RE_KERNEL_VERSION = r"^[-.0-9]+$"
+RE_MAC_ADDRESS = r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"

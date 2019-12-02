@@ -136,6 +136,11 @@ def is_ipv4(value):
     return False
 
 
+def is_mac(value):
+    assert isinstance(value, str), "mac address should be a string"
+    return re.search(constants.RE_MAC_ADDRESS, value)
+
+
 class VmPrefsBuilder:
     def __init__(self):
         self._prefs = dict({"memory": 400, "maxmem": 1000})
@@ -169,7 +174,8 @@ class VmPrefsBuilder:
 
     def kernel(self, value):
         assert re.search(constants.RE_KERNEL_VERSION, value), \
-            "kernel is invalid - it should be number, dots, and dashes: {}".format(value)
+            "kernel is invalid - it should be number, dots, and dashes: {}".format(
+                value)
         self._prefs["kernel"] = value
         return self
 
@@ -187,9 +193,8 @@ class VmPrefsBuilder:
         return self
 
     def mac(self, value):
-        # TODO: constrain to mac address
-        assert is_meaningful_string(
-            value), "mac must be a non-empty string"
+        assert is_mac(value), \
+            "mac is invalid, must be a mac address: {}".format(value)
         self._prefs["mac"] = value
         return self
 
