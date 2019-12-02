@@ -1,5 +1,3 @@
-from subprocess import check_call, CalledProcessError
-from qsm.error import raise_process_error
 from qsm.lib import print_header, print_sub, parse_packages
 from qsm.constants import GREEN, WHITE, RED
 from qsm.lib import run
@@ -9,11 +7,8 @@ def create(name, label, options=None):
     print_header("creating vm {}".format(name))
 
     _options = "\b" if options is None else options
-    try:
-        check_call("qvm-create --label {} {} {}".format(label,
-                                                        _options, name), shell=True)
-    except CalledProcessError:
-        raise_process_error()
+    _command = "qvm-create --label {} {} {}".format(label, _options, name)
+    run(command=_command, target="dom0", user="root")
 
     print_sub("{} created".format(name))
 
@@ -21,22 +16,18 @@ def create(name, label, options=None):
 def set_prefs(target, options):
     print_header("setting prefs for {}".format(target))
 
-    try:
-        for _option, _value in options.items():
-            check_call("qvm-prefs -s {} {} \'{}\'".format(target,
-                                                          _option, _value), shell=True)
-            print_sub("{}: {}".format(_option, _value))
-    except CalledProcessError:
-        raise_process_error("- cannot set vm preferences")
+    for _option, _value in options.items():
+        _command = "qvm-prefs -s {} {} \'{}\'".format(target, _option, _value)
+        run(command=_command, target="dom0", user="root")
+
+        print_sub("{}: {}".format(_option, _value))
 
 
 def start(target):
     print_header("starting {}".format(target))
 
-    try:
-        check_call("qvm-start --skip-if-running {}".format(target), shell=True)
-    except CalledProcessError:
-        raise_process_error("- unable to start vm")
+    _command = "qvm-start --skip-if-running {}".format(target)
+    run(command=_command, target="dom0", user="root")
 
     print_sub("{} started".format(target))
 
@@ -44,11 +35,8 @@ def start(target):
 def stop(target, timeout=120):
     print_header("stopping {}".format(target))
 
-    try:
-        check_call(
-            "qvm-shutdown --wait --timeout {} {}".format(timeout, target), shell=True)
-    except CalledProcessError:
-        raise_process_error("- unable to stop vm")
+    _command = "qvm-shutdown --wait --timeout {} {}".format(timeout, target)
+    run(command=_command, target="dom0", user="root")
 
     print_sub("{} stopped".format(target))
 
@@ -56,10 +44,8 @@ def stop(target, timeout=120):
 def remove(target):
     print_header("removing {}".format(target))
 
-    try:
-        check_call("qvm-remove --force {}".format(target), shell=True)
-    except CalledProcessError:
-        raise_process_error("- unable to remove vm")
+    _command = "qvm-remove --force {}".format(target)
+    run(command=_command, target="dom0", user="root")
 
     print_sub("{} removed".format(target))
 
@@ -67,10 +53,8 @@ def remove(target):
 def clone(source, target):
     print_header("cloning {} into {}".format(source, target))
 
-    try:
-        check_call("qvm-clone {} {}".format(source, target), shell=True)
-    except CalledProcessError:
-        raise_process_error("- unable to clone vm")
+    _command = "qvm-clone {} {}".format(source, target)
+    run(command=_command, target="dom0", user="root")
 
     print_sub("{} created".format(target))
 
@@ -78,23 +62,21 @@ def clone(source, target):
 def enable_services(target, services):
     print(GREEN+"enabling"+WHITE+" services on {}...".format(target))
 
-    try:
-        for _service in services:
-            check_call("qvm-service --enable {}".format(_service), shell=True)
-            print_sub("{}".format(_service))
-    except CalledProcessError:
-        raise_process_error("- unable to enable service")
+    for _service in services:
+        _command = "qvm-service --enable {}".format(_service)
+        run(command=_command, target="dom0", user="root")
+
+        print_sub("{}".format(_service))
 
 
 def disable_services(target, services):
     print(RED+"disabling"+WHITE+" services on {}...".format(target))
 
-    try:
-        for _service in services:
-            check_call("qvm-service --disable {}".format(_service), shell=True)
-            print_sub("{}".format(_service))
-    except CalledProcessError:
-        raise_process_error("- unable to disable service")
+    for _service in services:
+        _command = "qvm-service --disable {}".format(_service)
+        run(command=_command, target="dom0", user="root")
+
+        print_sub("{}".format(_service))
 
 
 def update():
