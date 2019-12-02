@@ -4,14 +4,15 @@ from qsm.constants import GREEN, WHITE, RED
 
 
 def exists(target):
-    _command = "qvm-check --quiet {} > 2&>1 >/dev/null"
+    _command = "qvm-check --quiet {} >/dev/null".format(target)
     try:
         run(command=_command, target="dom0", user="root")
     except QsmProcessError as error:
-        if error.returncode == 2:  # 2 is "domain not found"
-            return False
-        else:
-            raise error  # something else went wrong
+        if error.returncode != 2:  # 2 is "domain not found"
+            print_sub("a problem occurred when checking if {} exists".format(
+                target), failed=True)
+            raise error
+        return False
     return True
 
 
@@ -19,6 +20,40 @@ def exists_or_throws(target, message=None):
     _message = "{} doesn't exist" if message is None else message
 
     if not exists(target):
+        print_sub(_message, failed=True)
+        raise QsmPreconditionError
+
+    return True
+
+
+def is_running(target):
+    _command = "qvm-check --quiet --running {} >/dev/null".format(
+        target)
+    try:
+        run(command=_command, target="dom0", user="root")
+    except QsmProcessError as error:
+        if error.returncode != 1:  # 1 is "domain is running"
+            print_sub("a problem occurred when checking if {} is running".format(
+                target), failed=True)
+            raise error
+        return True
+    return False
+
+
+def is_running_or_throws(target, message=None):
+    _message = "{} is not running" if message is None else message
+
+    if is_running(target):
+        return True
+
+    print_sub(_message, failed=True)
+    raise QsmPreconditionError
+
+
+def is_stopped_or_throws(target, message=None):
+    _message = "{} is running" if message is None else message
+
+    if is_running(target):
         print_sub(_message, failed=True)
         raise QsmPreconditionError
 
@@ -67,18 +102,27 @@ def start(target):
 
 
 def stop(target, timeout=120):
-    print_header("stopping {}".format(target))
     exists_or_throws(target)
 
-    _command = "qvm-shutdown --wait --timeout {} {}".format(timeout, target)
-    run(command=_command, target="dom0", user="root")
+    print_header("stopping {}".format(target))
 
-    print_sub("{} stopped".format(target))
+    if is_running(target):
+        _command = "qvm-shutdown --wait --timeout {} {}".format(timeout, target)
+        run(command=_command, target="dom0", user="root")
+
+        print_sub("{} stopped".format(target))
+        return
+
+    print_sub_warning("{} already stopped".format(target))
 
 
-# TODO: check not running, shutdown first
-def remove(target):
+def remove(target, shutdown_ok=False):
     print_header("removing {}".format(target))
+
+    if shutdown_ok:
+        stop(target)
+    else:
+        is_stopped_or_throws(target)
 
     _command = "qvm-remove --quiet --force {}".format(target)
     if exists(target):  # pep.. shhh
