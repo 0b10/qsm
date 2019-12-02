@@ -146,7 +146,10 @@ def remove(target, shutdown_ok=False):
             is_stopped_or_throws(target)
         run(command=_command, target="dom0", user="root")
 
-    print_sub("{} removal finished".format(target))
+        print_sub("{} removal finished".format(target))
+        return
+
+    print_sub_warning("{} doesn't exist, continuing...".format(target))
 
 
 def clone(source, target):
