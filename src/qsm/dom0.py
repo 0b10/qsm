@@ -13,14 +13,14 @@ def create(name, label, options=None):
     print_sub("{} created".format(name))
 
 
-def vm_prefs(target, options):
+def vm_prefs(target, prefs):
     print_header("setting prefs for {}".format(target))
 
-    for _option, _value in options.items():
-        _command = "qvm-prefs -s {} {} \'{}\'".format(target, _option, _value)
+    for _key, _value in prefs.items():
+        _command = "qvm-prefs -s {} {} \'{}\'".format(target, _key, _value)
         run(command=_command, target="dom0", user="root")
 
-        print_sub("{}: {}".format(_option, _value))
+        print_sub("{}: {}".format(_key, _value))
 
 
 def start(target):
