@@ -113,9 +113,8 @@ def start(target):
 
 
 def stop(target, timeout=120):
-    exists_or_throws(target)
-
     print_header("stopping {}".format(target))
+    exists_or_throws(target)
 
     if is_running(target):
         _command = "qvm-shutdown --wait --timeout {} {}".format(
