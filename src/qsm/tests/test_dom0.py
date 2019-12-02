@@ -1,19 +1,19 @@
 from qsm import dom0, lib
 from unittest.mock import patch
 import pytest
-from qsm.constants import QVM_CHECK_DOMAIN_NOT_FOUND
+from qsm.constants import QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING
 
 
 # >>> exists() >>>
 
 
-def test_exists_return_true_when_vm_exists():
+def test_exists_returns_true_when_vm_exists():
     with patch("qsm.dom0.run", return_value=None, autospec=True):
         assert dom0.exists("fedora-template") is True
 
 
-def test_exists_return_false_when_vm_doesnt_exist():
-    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(QVM_CHECK_DOMAIN_NOT_FOUND), autospec=True):
+def test_exists_returns_false_when_vm_doesnt_exist():
+    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(QVM_CHECK_EXISTS_NOT_FOUND), autospec=True):
         assert dom0.exists("fedora-template") is False
 
 
@@ -43,3 +43,24 @@ def test_exists_or_throws_throws_for_unexpected_exit_code():
     with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(237687263), autospec=True):
         with pytest.raises(lib.QsmProcessError):
             dom0.exists("fedora-template")
+
+
+# >>> is_running() >>>
+
+
+def test_is_running_returns_true_when_vm_is_running():
+    # returncode 0 for a running vm, so run doesn't throw
+    with patch("qsm.dom0.run", return_value=None, autospec=True):
+        assert dom0.is_running("fedora-template") is True
+
+
+def test_is_running_returns_false_when_vm_isnt_running():
+    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(QVM_CHECK_IS_NOT_RUNNING), autospec=True):
+        assert dom0.is_running("fedora-template") is False
+
+
+def test_is_running_throws_for_unexpected_exit_code():
+    # returncode 2 is "domain not found"
+    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(7612736), autospec=True):
+        with pytest.raises(lib.QsmProcessError):
+            dom0.is_running("fedora-template")
