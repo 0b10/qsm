@@ -3,7 +3,10 @@ from qsm.lib import (print_header, print_sub, parse_packages, run, QsmProcessErr
                      QsmDomainRunningError, QsmDomainStoppedError)
 from qsm.constants import (QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING,
                            QVM_CREATE_DOMAIN_ALREADY_EXISTS)
+import types
 
+
+# >>> PREDICATES >>>
 
 def exists(target):
     _command = "qvm-check --quiet {} 2>/dev/null".format(target)
@@ -77,6 +80,8 @@ def is_stopped_or_throws(target, message=None):
     return True
 
 
+# >>> DOMAIN PROVISIONING >>>
+
 def create(name, label, options=None, exists_ok=True):
     print_header("creating vm {}".format(name))
 
@@ -100,6 +105,8 @@ def create(name, label, options=None, exists_ok=True):
 
 
 def vm_prefs(target, prefs):
+    assert type(prefs) is dict, "prefs should be a dict"
+
     print_header("setting prefs for {}".format(target))
     exists_or_throws(target)
 
@@ -164,6 +171,8 @@ def clone(source, target):
 
 
 def enable_services(target, services):
+    assert type(services) is list, "services should be a list"
+
     print_header("enabling services on {}...".format(target))
     exists_or_throws(target)
 
@@ -175,6 +184,8 @@ def enable_services(target, services):
 
 
 def disable_services(target, services):
+    assert type(services) is list, "services should be a list"
+
     print_header("disabling services on {}...".format(target))
     exists_or_throws(target)
 
@@ -185,6 +196,8 @@ def disable_services(target, services):
 
         print_sub("{}".format(_service))
 
+
+# >>> PACKAGE MANAGER >>>
 
 def update():
     print_header("updating dom0")
@@ -212,3 +225,37 @@ def uninstall(packages):
     run(command=_command, target="dom0", user="root")
 
     print_sub("dom0 package uninstallation finished")
+
+
+# >>> CONVENIENCE FUNCTIONS >>>
+def _is_all_funcs(list_):
+    return type(list_) is list and all([isinstance(item, types.FunctionType) for item in list_])
+
+
+def _merge_prefs(prefs, label):
+    _label = {"label": label}
+    return {**prefs, **_label} if prefs else _label
+
+
+def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None):
+    assert type(prefs) is dict or prefs is None, "prefs should be a dict, or None"
+
+    _prefs = prefs
+
+    if clone_from:
+        clone(clone_from, name)
+        _prefs = _merge_prefs(prefs, label)  # set label
+    else:
+        create(name, label)
+
+    if _prefs:
+        prefs(name, _prefs)
+
+    if services:
+        enable_services(name, services)
+
+    if jobs:
+        assert _is_all_funcs(jobs), \
+            "jobs should be a list of funcs/lambdas, that take no params: [lambda: my_func(param), ...]"
+        for job in jobs:
+            job()
