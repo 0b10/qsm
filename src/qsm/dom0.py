@@ -1,5 +1,6 @@
-from qsm.lib import (print_header, print_sub, parse_packages, run, QsmPreconditionError, QsmProcessError,
-                     print_sub_warning)
+from qsm.lib import (print_header, print_sub, parse_packages, run, QsmProcessError,
+                     print_sub_warning, QsmDomainDoesntExistError, QsmDomainAlreadyExistError,
+                     QsmDomainRunningError, QsmDomainStoppedError)
 from qsm.constants import GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND
 
 
@@ -17,23 +18,23 @@ def exists(target):
 
 
 def exists_or_throws(target, message=None):
-    _message = "{} doesn't exist" if message is None else message
+    _message = "{} doesn't exist".format(target) if message is None else message
 
     if exists(target):
         return True
 
     print_sub(_message, failed=True)
-    raise QsmPreconditionError
+    raise QsmDomainDoesntExistError
 
 
 def not_exists_or_throws(target, message=None):
-    _message = "{} doesn't exist" if message is None else message
+    _message = "{} doesn't exist".format(target) if message is None else message
 
     if not exists(target):
         return True
 
     print_sub(_message, failed=True)
-    raise QsmPreconditionError
+    raise QsmDomainAlreadyExistError
 
 
 def is_running(target):
@@ -51,21 +52,21 @@ def is_running(target):
 
 
 def is_running_or_throws(target, message=None):
-    _message = "{} is not running" if message is None else message
+    _message = "{} is not running".format(target) if message is None else message
 
     if is_running(target):
         return True
 
     print_sub(_message, failed=True)
-    raise QsmPreconditionError
+    raise QsmDomainStoppedError
 
 
 def is_stopped_or_throws(target, message=None):
-    _message = "{} is running" if message is None else message
+    _message = "{} is running".format(target) if message is None else message
 
     if is_running(target):
         print_sub(_message, failed=True)
-        raise QsmPreconditionError
+        raise QsmDomainRunningError
 
     return True
 

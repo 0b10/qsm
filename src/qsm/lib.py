@@ -10,6 +10,7 @@ def print_sub(message, failed=False):
     _colour = RED if failed else GREEN
     print(_colour + ">>> " + message + WHITE)
 
+
 def print_sub_warning(message):
     print(YELLOW + ">>> " + message + WHITE)
 
@@ -53,6 +54,7 @@ class QsmProcessError(Exception):
     """
     Raised when a process returns a non-zero exit status.
     """
+
     def __init__(self, returncode):
         self.returncode = returncode
 
@@ -60,6 +62,34 @@ class QsmProcessError(Exception):
 class QsmPreconditionError(Exception):
     """
     Raised when a precondition is not met.
+    """
+    pass
+
+
+class QsmDomainRunningError(Exception):
+    """
+    Raised when a domain is running when it shouldn't be.
+    """
+    pass
+
+
+class QsmDomainStoppedError(Exception):
+    """
+    Raised when a domain is stopped when it shouldn't be.
+    """
+    pass
+
+
+class QsmDomainDoesntExistError(Exception):
+    """
+    Raised when a domain doesn't exist when it should.
+    """
+    pass
+
+
+class QsmDomainAlreadyExistError(Exception):
+    """
+    Raised when a domain exist when it shouldn't.
     """
     pass
 

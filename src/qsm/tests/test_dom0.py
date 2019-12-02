@@ -34,7 +34,7 @@ def test_exists_or_throws_return_true_when_vm_exists():
 def test_exists_or_throws_throws_when_vm_doesnt_exist():
     # returncode 2 is "domain not found"
     with patch("qsm.dom0.exists", return_value=False, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+        with pytest.raises(lib.QsmDomainDoesntExistError):
             dom0.exists_or_throws("fedora-template")
 
 
@@ -55,7 +55,7 @@ def test_not_exists_or_throws_return_true_when_vm_exists():
 def test_not_exists_or_throws_throws_when_vm_doesnt_exist():
     # returncode 2 is "domain not found"
     with patch("qsm.dom0.exists", return_value=True, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+        with pytest.raises(lib.QsmDomainAlreadyExistError):
             dom0.not_exists_or_throws("fedora-template")
 
 
@@ -97,7 +97,7 @@ def test_is_running_or_throws_returns_true_when_vm_is_running():
 
 def test_is_running_or_throws_throws_when_vm_isnt_running():
     with patch("qsm.dom0.is_running", return_value=False, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+        with pytest.raises(lib.QsmDomainStoppedError):
             assert dom0.is_running_or_throws("fedora-template")
 
 
@@ -119,7 +119,7 @@ def test_is_stopped_or_throws_returns_true_when_vm_is_not_running():
 
 def test_is_stopped_or_throws_throws_when_vm_is_running():
     with patch("qsm.dom0.is_running", return_value=True, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+        with pytest.raises(lib.QsmDomainRunningError):
             assert dom0.is_stopped_or_throws("fedora-template")
 
 
@@ -146,7 +146,7 @@ def test_create_exists_ok_doesnt_throw_when_vm_exists():
 def test_create_exists_ok_false_throws_when_vm_exists():
     # run should return None (exit code 0) when vm exists
     with patch("qsm.dom0.run", return_value=None, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+        with pytest.raises(lib.QsmDomainAlreadyExistError):
             dom0.create("fedora-template", "red", exists_ok=False)
 
 
@@ -171,8 +171,8 @@ def test_vm_prefs_executes_if_vm_exists():
 
 def test_vm_prefs_throws_if_vm_doesnt_exist():
     # exists_or_throws returns True when vm exists
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
+        with pytest.raises(lib.QsmDomainDoesntExistError):
             dom0.vm_prefs("fedora-template", {"qrexec_timeout": "120"})
 
 
@@ -190,8 +190,8 @@ def test_start_executes_if_vm_exists():
 
 def test_start_throws_if_vm_doesnt_exist():
     # exists_or_throws returns True when vm exists
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
+        with pytest.raises(lib.QsmDomainDoesntExistError):
             dom0.start("fedora-template")
 
 # >>> stop() >>>
@@ -220,8 +220,8 @@ def test_stop_executes_if_vm_exists_and_not_running():
 
 def test_stop_throws_if_vm_doesnt_exist():
     # exists_or_throws throws when vm doesn't exist
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
-        with pytest.raises(lib.QsmPreconditionError):
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
+        with pytest.raises(lib.QsmDomainDoesntExistError):
             dom0.stop("fedora-template")
 
 # >>> clone() >>>
@@ -238,10 +238,10 @@ def test_clone_executes_if_vm_exists():
 
 def test_clone_throws_if_vm_doesnt_exist():
     # exists_or_throws throws when vm doesn't exist
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
         # run returns None for successful run
         with patch("qsm.dom0.run", return_value=None, autospec=True):
-            with pytest.raises(lib.QsmPreconditionError):
+            with pytest.raises(lib.QsmDomainDoesntExistError):
                 dom0.clone("fedora-template", "cloned-vm")
 
 
@@ -260,10 +260,10 @@ def test_enable_services_executes_if_vm_exists():
 
 def test_enable_services_throws_if_vm_doesnt_exist():
     # exists_or_throws throws when vm doesn't exist
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
         # run returns None for successful run
         with patch("qsm.dom0.run", return_value=None, autospec=True):
-            with pytest.raises(lib.QsmPreconditionError):
+            with pytest.raises(lib.QsmDomainDoesntExistError):
                 dom0.enable_services(
                     "fedora-template", ["service-one", "service-two"])
 
@@ -282,9 +282,9 @@ def test_disable_services_executes_if_vm_exists():
 
 def test_disable_services_throws_if_vm_doesnt_exist():
     # exists_or_throws throws when vm doesn't exist
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
         # run returns None for successful run
         with patch("qsm.dom0.run", return_value=None, autospec=True):
-            with pytest.raises(lib.QsmPreconditionError):
+            with pytest.raises(lib.QsmDomainDoesntExistError):
                 dom0.disable_services(
                     "fedora-template", ["service-one", "service-two"])
