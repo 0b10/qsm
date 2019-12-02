@@ -19,11 +19,21 @@ def exists(target):
 def exists_or_throws(target, message=None):
     _message = "{} doesn't exist" if message is None else message
 
-    if not exists(target):
-        print_sub(_message, failed=True)
-        raise QsmPreconditionError
+    if exists(target):
+        return True
 
-    return True
+    print_sub(_message, failed=True)
+    raise QsmPreconditionError
+
+
+def not_exists_or_throws(target, message=None):
+    _message = "{} doesn't exist" if message is None else message
+
+    if not exists(target):
+        return True
+
+    print_sub(_message, failed=True)
+    raise QsmPreconditionError
 
 
 def is_running(target):
@@ -73,7 +83,7 @@ def create(name, label, options=None, exists_ok=True):
             if error.returncode != 1:  # 1 is "already exists"
                 raise error
     else:
-        exists_or_throws(name)
+        not_exists_or_throws(name)
         # only reachable if exists
         print_sub_warning("{} already exists, using that".format(name))
 

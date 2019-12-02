@@ -44,6 +44,27 @@ def test_exists_or_throws_throws_for_unexpected_exit_code():
         with pytest.raises(lib.QsmProcessError):
             dom0.exists("fedora-template")
 
+# >>> not_exists_or_throws() >>>
+
+
+def test_not_exists_or_throws_return_true_when_vm_exists():
+    with patch("qsm.dom0.exists", return_value=False, autospec=True):
+        assert dom0.not_exists_or_throws("fedora-template") is True
+
+
+def test_not_exists_or_throws_throws_when_vm_doesnt_exist():
+    # returncode 2 is "domain not found"
+    with patch("qsm.dom0.exists", return_value=True, autospec=True):
+        with pytest.raises(lib.QsmPreconditionError):
+            dom0.not_exists_or_throws("fedora-template")
+
+
+def test_not_exists_or_throws_throws_for_unexpected_exit_code():
+    # returncode 2 is "domain not found"
+    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(237687263), autospec=True):
+        with pytest.raises(lib.QsmProcessError):
+            dom0.exists("fedora-template")
+
 
 # >>> is_running() >>>
 
@@ -107,3 +128,30 @@ def test_is_stopped_or_throws_throws_for_unexpected_exit_code():
     with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(7612736), autospec=True):
         with pytest.raises(lib.QsmProcessError):
             dom0.is_stopped_or_throws("fedora-template")
+
+
+# >>> create() >>>
+
+
+def test_create_exists_ok_doesnt_throw_when_vm_exists():
+    # run should return None (exit code 0) when vm exists
+    with patch("qsm.dom0.run", return_value=None, autospec=True):
+        try:
+            dom0.create("fedora-template", "red", exists_ok=True)
+        except lib.QsmProcessError:
+            pytest.fail(
+                "create should not throw when vm exists, and exists_ok=True")
+
+
+def test_create_exists_ok_false_throws_when_vm_exists():
+    # run should return None (exit code 0) when vm exists
+    with patch("qsm.dom0.run", return_value=None, autospec=True):
+        with pytest.raises(lib.QsmPreconditionError):
+            dom0.create("fedora-template", "red", exists_ok=False)
+
+
+def test_create_exists_ok_throws_when_unexpected_exit_code():
+    # run should exit(2) when vm doesn't exist, so any exit code other than that
+    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(273863), autospec=True):
+        with pytest.raises(lib.QsmProcessError):
+            dom0.create("fedora-template", "red", exists_ok=True)
