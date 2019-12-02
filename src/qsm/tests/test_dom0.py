@@ -135,19 +135,29 @@ def test_is_stopped_or_throws_throws_for_unexpected_exit_code():
 
 def test_create_exists_ok_doesnt_throw_when_vm_exists():
     # run should return None (exit code 0) when vm exists
-    with patch("qsm.dom0.run", return_value=None, autospec=True):
+    with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
         try:
             dom0.create("fedora-template", "red", exists_ok=True)
         except lib.QsmProcessError:
             pytest.fail(
                 "create should not throw when vm exists, and exists_ok=True")
 
+        assert mock_run.called, "run was not called, vm not created"
+
 
 def test_create_exists_ok_false_throws_when_vm_exists():
     # run should return None (exit code 0) when vm exists
-    with patch("qsm.dom0.run", return_value=None, autospec=True):
+    with patch("qsm.dom0.not_exists_or_throws", side_effect=lib.QsmDomainAlreadyExistError, autospec=True):
         with pytest.raises(lib.QsmDomainAlreadyExistError):
             dom0.create("fedora-template", "red", exists_ok=False)
+
+
+def test_create_exists_ok_false_creates_a_vm():
+    # run should return None (exit code 0) when vm exists
+    with patch("qsm.dom0.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.not_exists_or_throws", return_value=True, autospec=True) as mock_exists:
+            dom0.create("fedora-template", "red", exists_ok=False)
+            assert mock_exists.called, "run was not called, vm not created"
 
 
 def test_create_exists_ok_throws_when_unexpected_exit_code():
