@@ -135,6 +135,10 @@ def is_ipv4(value):
     return False
 
 
+def is_uuid(value):
+    return isinstance(value, str) and re.search(constants.RE_UUID, value)
+
+
 class VmPrefsBuilder:
     def __init__(self):
         self._prefs = dict()
@@ -279,9 +283,7 @@ class VmPrefsBuilder:
         return self
 
     def uuid(self, value):
-        # TODO: constrain by uuid
-        assert is_meaningful_string(
-            value), "uuid must be a non-empty string"
+        assert is_uuid(value), "uuid is invalid: {}".format(value)
         self._prefs["uuid"] = value
         return self
 
