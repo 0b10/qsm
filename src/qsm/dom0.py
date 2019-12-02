@@ -1,6 +1,6 @@
 from qsm.lib import (print_header, print_sub, parse_packages, run, QsmPreconditionError, QsmProcessError,
                      print_sub_warning)
-from qsm.constants import GREEN, WHITE, RED
+from qsm.constants import GREEN, WHITE, RED, QVM_CHECK_DOMAIN_NOT_FOUND
 
 
 def exists(target):
@@ -8,7 +8,7 @@ def exists(target):
     try:
         run(command=_command, target="dom0", user="root")
     except QsmProcessError as error:
-        if error.returncode != 2:  # 2 is "domain not found"
+        if error.returncode != QVM_CHECK_DOMAIN_NOT_FOUND:
             print_sub("a problem occurred when checking if {} exists".format(
                 target), failed=True)
             raise error
@@ -107,7 +107,8 @@ def stop(target, timeout=120):
     print_header("stopping {}".format(target))
 
     if is_running(target):
-        _command = "qvm-shutdown --wait --timeout {} {}".format(timeout, target)
+        _command = "qvm-shutdown --wait --timeout {} {}".format(
+            timeout, target)
         run(command=_command, target="dom0", user="root")
 
         print_sub("{} stopped".format(target))
