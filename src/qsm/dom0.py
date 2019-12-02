@@ -155,6 +155,7 @@ def remove(target, shutdown_ok=False):
 def clone(source, target):
     print_header("cloning {} into {}".format(source, target))
     exists_or_throws(source)
+    not_exists_or_throws(target)
 
     _command = "qvm-clone {} {}".format(source, target)
     run(command=_command, target="dom0", user="root")

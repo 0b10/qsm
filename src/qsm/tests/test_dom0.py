@@ -229,20 +229,32 @@ def test_stop_throws_if_vm_doesnt_exist():
 
 def test_clone_executes_if_vm_exists():
     # exists_or_throws returns True when vm exists
-    with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
-        # run returns None for successful run
-        with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
-            dom0.clone("fedora-template", "cloned-vm")
-            assert mock_run.called, "run was not called, clone not executed"
+    with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):  # pass
+        with patch("qsm.dom0.not_exists_or_throws", return_value=True, autospec=True):  # pass
+            # run returns None for successful run
+            with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
+                dom0.clone("fedora-template", "cloned-vm")
+                assert mock_run.called, "run was not called, clone not executed"
 
 
 def test_clone_throws_if_vm_doesnt_exist():
     # exists_or_throws throws when vm doesn't exist
-    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
-        # run returns None for successful run
-        with patch("qsm.dom0.run", return_value=None, autospec=True):
-            with pytest.raises(lib.QsmDomainDoesntExistError):
-                dom0.clone("fedora-template", "cloned-vm")
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):  # fails
+        with patch("qsm.dom0.not_exists_or_throws", return_value=True, autospec=True):  # pass
+            # run returns None for successful run
+            with patch("qsm.dom0.run", return_value=None, autospec=True):
+                with pytest.raises(lib.QsmDomainDoesntExistError):
+                    dom0.clone("fedora-template", "cloned-vm")
+
+
+def test_clone_throws_if_already_exist():
+    # exists_or_throws throws when vm doesn't exist
+    with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):  # pass
+        with patch("qsm.dom0.not_exists_or_throws", side_effect=lib.QsmDomainAlreadyExistError, autospec=True):  # fail
+            # run returns None for successful run
+            with patch("qsm.dom0.run", return_value=None, autospec=True):
+                with pytest.raises(lib.QsmDomainAlreadyExistError):
+                    dom0.clone("fedora-template", "cloned-vm")
 
 
 # >>> enable_services() >>>
