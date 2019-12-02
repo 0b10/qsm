@@ -136,10 +136,6 @@ def is_ipv4(value):
     return False
 
 
-def is_uuid(value):
-    return isinstance(value, str) and re.search(constants.RE_UUID, value)
-
-
 class VmPrefsBuilder:
     def __init__(self):
         self._prefs = dict({"memory": 400, "maxmem": 1000})
@@ -166,18 +162,6 @@ class VmPrefsBuilder:
         self._prefs["default_user"] = value
         return self
 
-    def gateway(self, value):
-        assert is_ipv4(value), "gateway should be an ipv4 address: {}".format(value)
-        self._prefs["gateway"] = value
-        return self
-
-    def gateway6(self, value):
-        # TODO: constrain ipv6
-        assert is_meaningful_string(
-            value), "gateway6 must be a non-empty string"
-        self._prefs["gateway6"] = value
-        return self
-
     def include_in_backups(self, value=True):
         assert type(value) is bool, "include_in_backups must be a bool"
         self._prefs["include_in_backups"] = value
@@ -194,13 +178,6 @@ class VmPrefsBuilder:
         assert is_meaningful_string(
             value), "kernel_opts must be a non-empty string"
         self._prefs["kernel_opts"] = value
-        return self
-
-    def klass(self, value):
-        # TODO: constrain
-        assert is_meaningful_string(
-            value), "klass must be a non-empty string"
-        self._prefs["klass"] = value
         return self
 
     def label(self, value):
@@ -275,16 +252,6 @@ class VmPrefsBuilder:
         self._prefs["template_for_dispvms"] = value
         return self
 
-    def updateable(self, value=True):
-        assert type(value) is bool, "updateable must be a bool"
-        self._prefs["updateable"] = value
-        return self
-
-    def uuid(self, value):
-        assert is_uuid(value), "uuid is invalid: {}".format(value)
-        self._prefs["uuid"] = value
-        return self
-
     def vcpus(self, value=4):
         assert type(value) is int and value > 0, "vcpus must be an integer > 0"
         self._prefs["vcpus"] = value
@@ -295,40 +262,6 @@ class VmPrefsBuilder:
             "virt_mode is invalid: {}, must be one of: {}".format(
                 value, constants.VIRT_MODES)
         self._prefs["virt_mode"] = value
-        return self
-
-    def visible_gateway(self, value):
-        assert is_ipv4(value), \
-            "visible_gateway should be an ipv4 address: {}".format(value)
-        self._prefs["visible_gateway"] = value
-        return self
-
-    def visible_gateway6(self, value):
-        # TODO: constrain by IP
-        assert is_meaningful_string(
-            value), "visible_gateway6 must be a non-empty string"
-        self._prefs["visible_gateway6"] = value
-        return self
-
-    def visible_ip(self, value):
-        assert is_ipv4(value), \
-            "visible_ip should be an ipv4 address: {}".format(value)
-        self._prefs["visible_ip"] = value
-        return self
-
-    def visible_ip6(self, value):
-        # TODO: constrain by IP
-        assert is_meaningful_string(
-            value), "visible_ip6 must be a non-empty string"
-        self._prefs["visible_ip6"] = value
-        return self
-
-    def visible_netmask(self, value):
-        assert is_ipv4(value), \
-            "visible_netmask is invalid: {}".format(value)
-        assert is_meaningful_string(
-            value), "visible_netmask must be a non-empty string"
-        self._prefs["visible_netmask"] = value
         return self
 
     def build(self):

@@ -117,16 +117,3 @@ def test_is_meaningful_string_rejects_empty_string():
 
 def test_is_meaningful_string_happy_path_fuzz():
     assert lib.is_meaningful_string("text"), "should be accepted"
-
-
-# ~~~ is_uuid() ~~~
-
-
-@hypothesis.given(s.uuids())
-def test_is_uuid_happy_path_fuzz(uuid):
-    assert lib.is_uuid(str(uuid)), "should be accepted: {}".format(uuid)
-
-
-@hypothesis.given(s.text())
-def test_is_uuid_negative_path_fuzz(text):
-    assert not lib.is_uuid(text), "should be rejected: {}".format(text)
