@@ -12,7 +12,7 @@ def exists(target):
     except QsmProcessError as error:
         if error.returncode != QVM_CHECK_EXISTS_NOT_FOUND:  # is not exit code 2
             # some other error occurred
-            print_sub("a problem occurred when checking if {} exists".format(
+            print_sub("a problem occurred when checking that {} exists".format(
                 target), failed=True)
             raise error
         return False  # is exit code 2 == domain doesn't exist
@@ -49,7 +49,7 @@ def is_running(target):
     except QsmProcessError as error:
         if error.returncode != QVM_CHECK_IS_NOT_RUNNING:  # is not exit code 1
             # some other error occurred
-            print_sub("a problem occurred when checking if {} is running".format(
+            print_sub("a problem occurred when checking that {} is running".format(
                 target), failed=True)
             raise error
         return False  # is exit code 1 == domain is not running
