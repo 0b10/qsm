@@ -155,3 +155,22 @@ def test_create_exists_ok_throws_when_unexpected_exit_code():
     with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(273863), autospec=True):
         with pytest.raises(lib.QsmProcessError):
             dom0.create("fedora-template", "red", exists_ok=True)
+
+
+# >>> vm_prefs() >>>
+
+
+def test_vm_prefs_executes_if_vm_exists():
+    # exists_or_throws returns True when vm exists
+    with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+        # run returns None for successful run
+        with patch("qsm.dom0.run", return_value=None, autospec=True) as mock_run:
+            dom0.vm_prefs("fedora-template", {"qrexec_timeout": "120"})
+            assert mock_run.called, "run was not called, vm_prefs not executed"
+
+
+def test_vm_prefs_throws_if_vm_doesnt_exist():
+    # exists_or_throws returns True when vm exists
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmPreconditionError, autospec=True):
+        with pytest.raises(lib.QsmPreconditionError):
+            dom0.vm_prefs("fedora-template", {"qrexec_timeout": "120"})
