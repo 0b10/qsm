@@ -64,3 +64,24 @@ def test_is_running_throws_for_unexpected_exit_code():
     with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(7612736), autospec=True):
         with pytest.raises(lib.QsmProcessError):
             dom0.is_running("fedora-template")
+
+# >>> is_running_or_throws() >>>
+
+
+def test_is_running_or_throws_returns_true_when_vm_is_running():
+    # returncode 0 for a running vm, so run doesn't throw
+    with patch("qsm.dom0.is_running", return_value=True, autospec=True):
+        assert dom0.is_running_or_throws("fedora-template") is True
+
+
+def test_is_running_or_throws_throws_when_vm_isnt_running():
+    with patch("qsm.dom0.is_running", return_value=False, autospec=True):
+        with pytest.raises(lib.QsmPreconditionError):
+            assert dom0.is_running_or_throws("fedora-template")
+
+
+def test_is_running_or_throws_throws_for_unexpected_exit_code():
+    # returncode 2 is "domain not found"
+    with patch("qsm.dom0.run", side_effect=lib.QsmProcessError(7612736), autospec=True):
+        with pytest.raises(lib.QsmProcessError):
+            dom0.is_running_or_throws("fedora-template")
