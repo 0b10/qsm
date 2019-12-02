@@ -79,6 +79,7 @@ class QsmProcessError(Exception):
     """
     Raised when a process returns a non-zero exit status.
     """
+
     def __init__(self, returncode):
         self.returncode = returncode
 
@@ -116,3 +117,207 @@ class QsmDomainAlreadyExistError(Exception):
     Raised when a domain exists but it shouldn't.
     """
     pass
+
+
+def _is_meaningful_string(value):
+    return isinstance(value, str) and value
+
+
+class VmPrefsBuilder:
+    def __init__(self):
+        self._prefs = dict()
+
+    def autostart(self, value=True):
+        assert type(value) is bool, "autostart must be a bool"
+        self._prefs["autostart"] = value
+        return self
+
+    def debug(self, value=True):
+        assert type(value) is bool, "debug must be a bool"
+        self._prefs["debug"] = value
+        return self
+
+    def default_dispvm(self, value):
+        assert _is_meaningful_string(
+            value), "default_dispvm must be a non-empty string"
+        self._prefs["default_dispvm"] = value
+        return self
+
+    def default_user(self, value):
+        assert _is_meaningful_string(
+            value), "default_user must be a non-empty string"
+        self._prefs["default_user"] = value
+        return self
+
+    def gateway(self, value):
+        # TODO: contrain ip
+        assert _is_meaningful_string(
+            value), "gateway must be a non-empty string"
+        self._prefs["gateway"] = value
+        return self
+
+    def gateway6(self, value):
+        # TODO: constrain ipv6
+        assert _is_meaningful_string(
+            value), "gateway6 must be a non-empty string"
+        self._prefs["gateway6"] = value
+        return self
+
+    def include_in_backups(self, value=True):
+        assert type(value) is bool, "include_in_backups must be a bool"
+        self._prefs["include_in_backups"] = value
+        return self
+
+    def kernel(self, value):
+        # TODO: regex, kernel version numbers
+        assert _is_meaningful_string(
+            value), "kernel must be a non-empty string"
+        self._prefs["kernel"] = value
+        return self
+
+    def kernel_opts(self, value):
+        assert _is_meaningful_string(
+            value), "kernel_opts must be a non-empty string"
+        self._prefs["kernel_opts"] = value
+        return self
+
+    def klass(self, value):
+        # TODO: constrain
+        assert _is_meaningful_string(
+            value), "klass must be a non-empty string"
+        self._prefs["klass"] = value
+        return self
+
+    def label(self, value):
+        # TODO: constrain to colours
+        assert _is_meaningful_string(
+            value), "label must be a non-empty string"
+        self._prefs["label"] = value
+        return self
+
+    def mac(self, value):
+        # TODO: constrain to mac address
+        assert _is_meaningful_string(
+            value), "mac must be a non-empty string"
+        self._prefs["mac"] = value
+        return self
+
+    def management_dispv(self, value):
+        assert _is_meaningful_string(
+            value), "management_dispv must be a non-empty string"
+        self._prefs["management_dispv"] = value
+        return self
+
+    def maxmem(self, value):
+        # TODO: constrain, use __init__, share values
+        assert isinstance(
+            value, int) and value > 0, "maxmem must be an integer > 0"
+        self._prefs["maxmem"] = value
+        return self
+
+    def memory(self, value):
+        # TODO: constrain, use __init__, share values
+        assert isinstance(
+            value, int) and value > 0, "memory must be an integer > 0"
+        self._prefs["memory"] = value
+        return self
+
+    def name(self, value):
+        assert _is_meaningful_string(
+            value), "name must be a non-empty string"
+        self._prefs["name"] = value
+        return self
+
+    def netvm(self, value):
+        assert _is_meaningful_string(
+            value), "netvm must be a non-empty string"
+        self._prefs["netvm"] = value
+        return self
+
+    def provides_network(self, value=True):
+        assert type(value) is bool, "provides_network must be a bool"
+        self._prefs["provides_network"] = value
+        return self
+
+    def qrexec_timeout(self, value=120):
+        assert isinstance(
+            value, int) and value > 0, "qrexec_timeout must be an integer > 0"
+        self._prefs["qrexec_timeout"] = value
+        return self
+
+    def shutdown_timeout(self, value=120):
+        assert isinstance(
+            value, int) and value > 0, "shutdown_timeout must be an integer > 0"
+        self._prefs["shutdown_timeout"] = value
+        return self
+
+    def template(self, value):
+        assert _is_meaningful_string(
+            value), "template must be a non-empty string"
+        self._prefs["template"] = value
+        return self
+
+    def template_for_dispvms(self, value=True):
+        assert type(value) is bool, "template_for_dispvms must be a bool"
+        self._prefs["template_for_dispvms"] = value
+        return self
+
+    def updateable(self, value=True):
+        assert type(value) is bool, "updateable must be a bool"
+        self._prefs["updateable"] = value
+        return self
+
+    def uuid(self, value):
+        # TODO: constrain by uuid
+        assert _is_meaningful_string(
+            value), "uuid must be a non-empty string"
+        self._prefs["uuid"] = value
+        return self
+
+    def vcpus(self, value=4):
+        assert isinstance(
+            value, int) and value > 0, "vcpus must be an integer > 0"
+        self._prefs["vcpus"] = value
+        return self
+
+    def virt_mode(self, value):
+        # TODO: constrain by virt modes
+        assert _is_meaningful_string(
+            value), "virt_mode must be a non-empty string"
+        self._prefs["virt_mode"] = value
+        return self
+
+    def visible_gateway(self, value):
+        # TODO: constrain by IP
+        assert _is_meaningful_string(
+            value), "visible_gateway must be a non-empty string"
+        self._prefs["visible_gateway"] = value
+        return self
+
+    def visible_gateway6(self, value):
+        # TODO: constrain by IP
+        assert _is_meaningful_string(
+            value), "visible_gateway6 must be a non-empty string"
+        self._prefs["visible_gateway6"] = value
+        return self
+
+    def visible_ip(self, value):
+        # TODO: constrain by IP
+        assert _is_meaningful_string(
+            value), "visible_ip must be a non-empty string"
+        self._prefs["visible_ip"] = value
+        return self
+
+    def visible_ip6(self, value):
+        # TODO: constrain by IP
+        assert _is_meaningful_string(
+            value), "visible_ip6 must be a non-empty string"
+        self._prefs["visible_ip6"] = value
+        return self
+
+    def visible_netmask(self, value):
+        # TODO: constrain by IP
+        assert _is_meaningful_string(
+            value), "visible_netmask must be a non-empty string"
+        self._prefs["visible_netmask"] = value
+        return self
