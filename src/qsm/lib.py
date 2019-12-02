@@ -1,6 +1,8 @@
 from qsm.constants import GREEN, WHITE, RED, PURPLE, YELLOW
 from subprocess import check_call, CalledProcessError
 
+# TODO: fix user for dom0, use local user
+
 
 def print_header(message):
     print(PURPLE + "+ " + message + "..." + WHITE)
@@ -27,8 +29,6 @@ def _run_dom0(command, target, user, show_message):
         if show_message:
             print_sub("dom0 command: '{}'".format(_command), failed=True)
         raise QsmProcessError(error.returncode)
-
-# TODO: --autostart, and refactor tests to use mock.call_args and re
 
 
 def _run_domU(command, target, user, show_message, colour=36, err_colour=36):

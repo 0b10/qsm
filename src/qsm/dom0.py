@@ -82,11 +82,10 @@ def is_stopped_or_throws(target, message=None):
 
 # >>> DOMAIN PROVISIONING >>>
 
-def create(name, label, options=None, exists_ok=True):
+def create(name, label, options="", exists_ok=True):
     print_header("creating vm {}".format(name))
 
-    _options = "\b" if options is None else options
-    _command = "qvm-create --label {} {} {}".format(label, _options, name)
+    _command = "qvm-create --label {} {} {}".format(label, options, name)
 
     if exists_ok:
         try:
@@ -164,7 +163,7 @@ def clone(source, target):
     exists_or_throws(source)
     not_exists_or_throws(target)
 
-    _command = "qvm-clone {} {}".format(source, target)
+    _command = "qvm-clone --quiet {} {} 2>/dev/null".format(source, target)
     run(command=_command, target="dom0", user="root", show_message=False)
 
     print_sub("{} created".format(target))
