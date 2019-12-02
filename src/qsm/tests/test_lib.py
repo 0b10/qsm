@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from qsm.lib import run, is_ipv4
+from qsm.lib import run, is_ipv4, is_meaningful_string
 from unittest.mock import patch
 import re
 import hypothesis
@@ -83,8 +83,9 @@ def test_domU_command_is_executed_as_root():
         assert re.search(r"^qvm-run[\w\W]+--user root",
                          _arg), "domU command not executed as root"
 
-# >>> PREDICATES >>>
 
+# >>> PREDICATES >>>
+# ~~~ is_ipv4() ~~~
 
 def test_is_ipv4_happy_path():
     for num in range(0, 255):
@@ -106,3 +107,13 @@ def test_is_ipv4_happy_boundaries():
 def test_is_ipv4_random_string(random_string):
     assert not is_ipv4(random_string), \
         "{} should be rejected".format(random_string)
+
+# ~~~ is_meaningful_string() ~~~
+
+
+def test_is_meaningful_string_rejects_empty_string():
+    assert not is_meaningful_string(""), "an empty string should be rejected"
+
+
+def test_is_meaningful_string_happy_path_fuzz():
+    assert is_meaningful_string("text"), "should be accepted"

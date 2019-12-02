@@ -22,6 +22,7 @@
 #
 from qsm.constants import GREEN, WHITE, RED, PURPLE, YELLOW
 from subprocess import check_call, CalledProcessError
+import re
 
 # TODO: fix user for dom0, use local user
 
@@ -119,12 +120,12 @@ class QsmDomainAlreadyExistError(Exception):
     pass
 
 
-def _is_meaningful_string(value):
-    return isinstance(value, str) and value
+def is_meaningful_string(value):
+    return isinstance(value, str) and not re.search("^ *$", value)
 
 
 def is_ipv4(value):
-    if _is_meaningful_string(value):
+    if is_meaningful_string(value):
         try:
             _seg_bools = [int and int(x) >= 0 and int(x) <= 255 for x in value.split(".")]
         except ValueError:
@@ -148,27 +149,27 @@ class VmPrefsBuilder:
         return self
 
     def default_dispvm(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "default_dispvm must be a non-empty string"
         self._prefs["default_dispvm"] = value
         return self
 
     def default_user(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "default_user must be a non-empty string"
         self._prefs["default_user"] = value
         return self
 
     def gateway(self, value):
         # TODO: contrain ip
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "gateway must be a non-empty string"
         self._prefs["gateway"] = value
         return self
 
     def gateway6(self, value):
         # TODO: constrain ipv6
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "gateway6 must be a non-empty string"
         self._prefs["gateway6"] = value
         return self
@@ -180,40 +181,40 @@ class VmPrefsBuilder:
 
     def kernel(self, value):
         # TODO: regex, kernel version numbers
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "kernel must be a non-empty string"
         self._prefs["kernel"] = value
         return self
 
     def kernel_opts(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "kernel_opts must be a non-empty string"
         self._prefs["kernel_opts"] = value
         return self
 
     def klass(self, value):
         # TODO: constrain
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "klass must be a non-empty string"
         self._prefs["klass"] = value
         return self
 
     def label(self, value):
         # TODO: constrain to colours
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "label must be a non-empty string"
         self._prefs["label"] = value
         return self
 
     def mac(self, value):
         # TODO: constrain to mac address
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "mac must be a non-empty string"
         self._prefs["mac"] = value
         return self
 
     def management_dispv(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "management_dispv must be a non-empty string"
         self._prefs["management_dispv"] = value
         return self
@@ -233,13 +234,13 @@ class VmPrefsBuilder:
         return self
 
     def name(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "name must be a non-empty string"
         self._prefs["name"] = value
         return self
 
     def netvm(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "netvm must be a non-empty string"
         self._prefs["netvm"] = value
         return self
@@ -262,7 +263,7 @@ class VmPrefsBuilder:
         return self
 
     def template(self, value):
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "template must be a non-empty string"
         self._prefs["template"] = value
         return self
@@ -279,7 +280,7 @@ class VmPrefsBuilder:
 
     def uuid(self, value):
         # TODO: constrain by uuid
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "uuid must be a non-empty string"
         self._prefs["uuid"] = value
         return self
@@ -292,42 +293,42 @@ class VmPrefsBuilder:
 
     def virt_mode(self, value):
         # TODO: constrain by virt modes
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "virt_mode must be a non-empty string"
         self._prefs["virt_mode"] = value
         return self
 
     def visible_gateway(self, value):
         # TODO: constrain by IP
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "visible_gateway must be a non-empty string"
         self._prefs["visible_gateway"] = value
         return self
 
     def visible_gateway6(self, value):
         # TODO: constrain by IP
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "visible_gateway6 must be a non-empty string"
         self._prefs["visible_gateway6"] = value
         return self
 
     def visible_ip(self, value):
         # TODO: constrain by IP
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "visible_ip must be a non-empty string"
         self._prefs["visible_ip"] = value
         return self
 
     def visible_ip6(self, value):
         # TODO: constrain by IP
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "visible_ip6 must be a non-empty string"
         self._prefs["visible_ip6"] = value
         return self
 
     def visible_netmask(self, value):
         # TODO: constrain by IP
-        assert _is_meaningful_string(
+        assert is_meaningful_string(
             value), "visible_netmask must be a non-empty string"
         self._prefs["visible_netmask"] = value
         return self
