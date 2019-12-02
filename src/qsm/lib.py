@@ -128,7 +128,8 @@ def is_meaningful_string(value):
 def is_ipv4(value):
     if is_meaningful_string(value):
         try:
-            _seg_bools = [int and int(x) >= 0 and int(x) <= 255 for x in value.split(".")]
+            _seg_bools = [int and int(x) >= 0 and int(
+                x) <= 255 for x in value.split(".")]
         except ValueError:
             return False
         return len(_seg_bools) == 4 and all(_seg_bools)
@@ -141,7 +142,7 @@ def is_uuid(value):
 
 class VmPrefsBuilder:
     def __init__(self):
-        self._prefs = dict()
+        self._prefs = dict({"memory": 400, "maxmem": 1000})
 
     def autostart(self, value=True):
         assert type(value) is bool, "autostart must be a bool"
@@ -206,7 +207,8 @@ class VmPrefsBuilder:
     def label(self, value):
         # TODO: constrain to colours
         assert value in constants.LABELS, \
-            "invalid label: '{}', must be one of: {}".format(value, constants.LABELS)
+            "invalid label: '{}', must be one of: {}".format(
+                value, constants.LABELS)
         self._prefs["label"] = value
         return self
 
@@ -333,3 +335,13 @@ class VmPrefsBuilder:
             value), "visible_netmask must be a non-empty string"
         self._prefs["visible_netmask"] = value
         return self
+
+    def build(self):
+        # check maxmem > memory here because it means they can be specified in any order
+        _maxmem = self._prefs["maxmem"]
+        _memory = self._prefs["memory"]
+        assert _maxmem > _memory, \
+            "maxmem must be greater than memory - maxmem: {}, memory: {}".format(
+                _maxmem, _memory)
+
+        return self._prefs
