@@ -146,42 +146,43 @@ class VmPrefsBuilder:
         self._prefs = dict({"memory": 400, "maxmem": 1000})
 
     def autostart(self, value=True):
-        assert type(value) is bool, "autostart must be a bool"
+        assert type(value) is bool, "autostart must be a bool: {}".format(value)
         self._prefs["autostart"] = value
         return self
 
     def debug(self, value=True):
-        assert type(value) is bool, "debug must be a bool"
+        assert type(value) is bool, "debug must be a bool: {}".format(value)
         self._prefs["debug"] = value
         return self
 
     def default_dispvm(self, value):
-        assert is_meaningful_string(
-            value), "default_dispvm must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "default_dispvm must be a non-empty string: {}".format(value)
         self._prefs["default_dispvm"] = value
         return self
 
     def default_user(self, value):
-        assert is_meaningful_string(
-            value), "default_user must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "default_user must be a non-empty string: {}".format(value)
         self._prefs["default_user"] = value
         return self
 
     def include_in_backups(self, value=True):
-        assert type(value) is bool, "include_in_backups must be a bool"
+        assert type(value) is bool, \
+            "include_in_backups must be a bool: {}".format(value)
         self._prefs["include_in_backups"] = value
         return self
 
     def kernel(self, value):
         assert re.search(constants.RE_KERNEL_VERSION, value), \
-            "kernel is invalid - it should be number, dots, and dashes: {}".format(
+            "kernel should be numbers, dots, and dashes: {}".format(
                 value)
         self._prefs["kernel"] = value
         return self
 
     def kernel_opts(self, value):
-        assert is_meaningful_string(
-            value), "kernel_opts must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "kernel_opts must be a non-empty string: {}".format(value)
         self._prefs["kernel_opts"] = value
         return self
 
@@ -194,70 +195,74 @@ class VmPrefsBuilder:
 
     def mac(self, value):
         assert is_mac(value), \
-            "mac is invalid, must be a mac address: {}".format(value)
+            "mac must be a mac address: {}".format(value)
         self._prefs["mac"] = value
         return self
 
     def management_dispv(self, value):
-        assert is_meaningful_string(
-            value), "management_dispv must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "management_dispv must be a non-empty string: {}".format(value)
         self._prefs["management_dispv"] = value
         return self
 
     def maxmem(self, value):
-        assert isinstance(
-            value, int) and value > 0, "maxmem must be an integer > 0"
+        assert isinstance(value, int) and value > 0, \
+            "maxmem must be an integer > 0: {}".format(value)
         self._prefs["maxmem"] = value
         return self
 
     def memory(self, value):
-        assert isinstance(
-            value, int) and value > 0, "memory must be an integer > 0"
+        assert isinstance(value, int) and value > 0, \
+            "memory must be an integer > 0: {}".format(value)
         self._prefs["memory"] = value
         return self
 
     def name(self, value):
-        assert is_meaningful_string(
-            value), "name must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "name must be a non-empty string: {}".format(value)
         self._prefs["name"] = value
         return self
 
     def netvm(self, value):
-        assert is_meaningful_string(
-            value), "netvm must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "netvm must be a non-empty string: {}".format(value)
         self._prefs["netvm"] = value
         return self
 
     def provides_network(self, value=True):
-        assert type(value) is bool, "provides_network must be a bool"
+        assert type(value) is bool, \
+            "provides_network must be a bool: {}".format(value)
         self._prefs["provides_network"] = value
         return self
 
     def qrexec_timeout(self, value=120):
-        assert isinstance(
-            value, int) and value > 0, "qrexec_timeout must be an integer > 0"
+        assert isinstance(value, int) and value > 0, \
+            "qrexec_timeout must be an integer > 0: {}".format(
+                value)
         self._prefs["qrexec_timeout"] = value
         return self
 
     def shutdown_timeout(self, value=120):
-        assert isinstance(
-            value, int) and value > 0, "shutdown_timeout must be an integer > 0"
+        assert isinstance(value, int) and value > 0, \
+            "shutdown_timeout must be an integer > 0: {}".format(value)
         self._prefs["shutdown_timeout"] = value
         return self
 
     def template(self, value):
-        assert is_meaningful_string(
-            value), "template must be a non-empty string"
+        assert is_meaningful_string(value), \
+            "template must be a non-empty string: {}".format(value)
         self._prefs["template"] = value
         return self
 
     def template_for_dispvms(self, value=True):
-        assert type(value) is bool, "template_for_dispvms must be a bool"
+        assert type(value) is bool, \
+            "template_for_dispvms must be a bool: {}".format(value)
         self._prefs["template_for_dispvms"] = value
         return self
 
     def vcpus(self, value=4):
-        assert type(value) is int and value > 0, "vcpus must be an integer > 0"
+        assert type(value) is int and value > 0, \
+            "vcpus must be an integer > 0: {}".format(value)
         self._prefs["vcpus"] = value
         return self
 
@@ -273,7 +278,7 @@ class VmPrefsBuilder:
         _maxmem = self._prefs["maxmem"]
         _memory = self._prefs["memory"]
         assert _maxmem > _memory, \
-            "maxmem must be greater than memory - maxmem: {}, memory: {}".format(
+            "maxmem must be greater than memory -- maxmem: {}, memory: {}".format(
                 _maxmem, _memory)
 
         return self._prefs
