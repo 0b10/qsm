@@ -34,7 +34,7 @@ def exists_or_throws(target, message=None):
 
 
 def not_exists_or_throws(target, message=None):
-    _message = "{} doesn't exist".format(
+    _message = "{} already exist".format(
         target) if message is None else message
 
     if not exists(target):
