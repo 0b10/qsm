@@ -168,8 +168,8 @@ def enable_services(target, services):
     exists_or_throws(target)
 
     for _service in services:
-        _command = "qvm-service --enable {}".format(_service)
-        run(command=_command, target="dom0", user="root")
+        _command = "qvm-service --enable {} {}".format(target, _service)
+        run(command=_command, target="dom0", user="root", show_message=False)
 
         print_sub("{}".format(_service))
 
@@ -179,7 +179,7 @@ def disable_services(target, services):
     exists_or_throws(target)
 
     for _service in services:
-        _command = "qvm-service --disable {}".format(_service)
+        _command = "qvm-service --disable {} {}".format(target, _service, show_message=False)
         run(command=_command, target="dom0", user="root")
 
         print_sub("{}".format(_service))
