@@ -32,5 +32,6 @@ QVM_CHECK_IS_NOT_RUNNING = 1
 QVM_CREATE_DOMAIN_ALREADY_EXISTS = 1
 
 LABELS = ["red", "orange", "yellow", "green", "gray", "blue", "purple", "black"]
+VIRT_MODES = ["pvh", "hvm", "pv"]
 
 RE_UUID = r"^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}){1}$"

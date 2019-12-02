@@ -167,8 +167,7 @@ class VmPrefsBuilder:
         return self
 
     def gateway(self, value):
-        # TODO: contrain ip
-        assert is_ipv4(value), "gateway should be an ipv4 address"
+        assert is_ipv4(value), "gateway should be an ipv4 address: {}".format(value)
         self._prefs["gateway"] = value
         return self
 
@@ -205,7 +204,6 @@ class VmPrefsBuilder:
         return self
 
     def label(self, value):
-        # TODO: constrain to colours
         assert value in constants.LABELS, \
             "invalid label: '{}', must be one of: {}".format(
                 value, constants.LABELS)
@@ -226,14 +224,12 @@ class VmPrefsBuilder:
         return self
 
     def maxmem(self, value):
-        # TODO: constrain, use __init__, share values
         assert isinstance(
             value, int) and value > 0, "maxmem must be an integer > 0"
         self._prefs["maxmem"] = value
         return self
 
     def memory(self, value):
-        # TODO: constrain, use __init__, share values
         assert isinstance(
             value, int) and value > 0, "memory must be an integer > 0"
         self._prefs["memory"] = value
@@ -290,15 +286,14 @@ class VmPrefsBuilder:
         return self
 
     def vcpus(self, value=4):
-        assert isinstance(
-            value, int) and value > 0, "vcpus must be an integer > 0"
+        assert type(value) is int and value > 0, "vcpus must be an integer > 0"
         self._prefs["vcpus"] = value
         return self
 
     def virt_mode(self, value):
-        # TODO: constrain by virt modes
-        assert is_meaningful_string(
-            value), "virt_mode must be a non-empty string"
+        assert value in constants.VIRT_MODES, \
+            "virt_mode is invalid: {}, must be one of: {}".format(
+                value, constants.VIRT_MODES)
         self._prefs["virt_mode"] = value
         return self
 
