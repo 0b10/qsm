@@ -96,10 +96,11 @@ def create(name, label, options="", exists_ok=True):
             if error.returncode != QVM_CREATE_DOMAIN_ALREADY_EXISTS:  # is not exit code 1
                 # some other error occurred
                 raise error
+            print_sub_warning("{} already exists, using that".format(name))
+            return
     else:
         not_exists_or_throws(name)
-        # only reachable if exists
-        print_sub_warning("{} already exists, using that".format(name))
+        run(command=_command, target="dom0", user="root", show_message=False)
 
     print_sub("{} creation finished".format(name))
 
