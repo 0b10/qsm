@@ -23,6 +23,10 @@
 from qsm.vm import update, install, uninstall
 from unittest.mock import patch
 import re
+from qsm import vm
+import hypothesis
+from hypothesis import strategies as s
+import pytest
 
 
 def test_update_exists():
@@ -150,3 +154,25 @@ def test_uninstall_excutes_on_correct_target():
 
         assert re.search(
             r" fedora-template ", _arg), "uninstall not executed on the correct target"
+
+
+# >>> VmPrefsBuilder >>>
+@hypothesis.given(s.booleans())
+def test_vm_prefs_builder_bools_happy_fuzz(value):
+    _prefs = vm.VmPrefsBuilder()
+    _methods = [_prefs.autostart, _prefs.debug, _prefs.include_in_backups,
+                _prefs.provides_network, _prefs.template_for_dispvms]
+
+    for _method in _methods:
+        assert _method(value), "should accept a boolean"
+
+
+@hypothesis.given(s.one_of(s.text(), s.complex_numbers(), s.decimals()))
+def test_vm_prefs_builder_bools_negative_fuzz(value):
+    _prefs = vm.VmPrefsBuilder()
+    _methods = [_prefs.autostart, _prefs.debug, _prefs.include_in_backups,
+                _prefs.provides_network, _prefs.template_for_dispvms]
+
+    for _method in _methods:
+        with pytest.raises(AssertionError):
+            _method(value)
