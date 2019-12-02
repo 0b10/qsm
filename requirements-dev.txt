@@ -1,3 +1,4 @@
+hypothesis==4.50.6
 manuel==1.10.1
 pytest==5.3.1
 python-boilerplate==0.4.10
