@@ -23,6 +23,7 @@
 from qsm.constants import GREEN, WHITE, RED, PURPLE, YELLOW
 from subprocess import check_call, CalledProcessError
 import re
+from qsm import constants
 
 # TODO: fix user for dom0, use local user
 
@@ -200,8 +201,8 @@ class VmPrefsBuilder:
 
     def label(self, value):
         # TODO: constrain to colours
-        assert is_meaningful_string(
-            value), "label must be a non-empty string"
+        assert value in constants.LABELS, \
+            "invalid label: '{}', must be one of: {}".format(value, constants.LABELS)
         self._prefs["label"] = value
         return self
 
