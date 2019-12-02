@@ -5,7 +5,7 @@ from qsm.constants import GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND
 
 
 def exists(target):
-    _command = "qvm-check --quiet {} >/dev/null".format(target)
+    _command = "qvm-check --quiet {} 2&>1 >/dev/null".format(target)
     try:
         run(command=_command, target="dom0", user="root")
     except QsmProcessError as error:
