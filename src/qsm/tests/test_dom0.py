@@ -1,5 +1,5 @@
 from qsm import dom0, lib
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import pytest
 from qsm.constants import QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING
 
@@ -300,3 +300,76 @@ def test_disable_services_throws_if_vm_doesnt_exist():
             with pytest.raises(lib.QsmDomainDoesntExistError):
                 dom0.disable_services(
                     "fedora-template", ["service-one", "service-two"])
+
+
+# >>> create_vm() >>>
+
+@patch("qsm.dom0.enable_services", return_value=None, autospec=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospec=True)
+@patch("qsm.dom0.clone", return_value=None, autospec=True)
+@patch("qsm.dom0.create", return_value=None, autospec=True)
+def test_create_vm_happy_path(mock_create, mock_clone, mock_vm_prefs, mock_enable_services):
+    dom0.create_vm("new-vm", "red")
+
+    assert mock_create.called, "the vm was not created"
+    assert not mock_clone.called, "the vm was cloned, instead of created"
+    assert not mock_vm_prefs.called, "prefs were set, but none were given"
+    assert not mock_enable_services.called, "services were enabled, but none were given"
+
+
+@patch("qsm.dom0.enable_services", return_value=None, autospec=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospec=True)
+@patch("qsm.dom0.clone", return_value=None, autospec=True)
+@patch("qsm.dom0.create", return_value=None, autospec=True)
+def test_create_vm_clone_from(mock_create, mock_clone, mock_vm_prefs, mock_enable_services):
+    dom0.create_vm("new-vm", "red", clone_from="source-vm")
+
+    assert not mock_create.called, "the vm was created, and not cloned"
+    assert mock_clone.called, "the vm was not cloned"
+    assert mock_vm_prefs.called, "prefs were not set, but a label should have been set"
+    assert not mock_enable_services.called, "services were enabled, but none were given"
+
+
+@patch("qsm.dom0.enable_services", return_value=None, autospec=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospec=True)
+@patch("qsm.dom0.clone", return_value=None, autospec=True)
+@patch("qsm.dom0.create", return_value=None, autospec=True)
+def test_create_vm_prefs_are_set(mock_create, mock_clone, mock_vm_prefs, mock_enable_services):
+    dom0.create_vm("new-vm", "red", prefs={"qrexec_timeout": 120})
+
+    assert mock_create.called, "the vm was not created"
+    assert not mock_clone.called, "the vm was cloned, instead of created"
+    assert mock_vm_prefs.called, "prefs were not set, but one was given"
+    assert not mock_enable_services.called, "services were enabled, but none were given"
+
+
+@patch("qsm.dom0.enable_services", return_value=None, autospec=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospec=True)
+@patch("qsm.dom0.clone", return_value=None, autospec=True)
+@patch("qsm.dom0.create", return_value=None, autospec=True)
+def test_create_vm_services_are_enabled(mock_create, mock_clone, mock_vm_prefs, mock_enable_services):
+    dom0.create_vm("new-vm", "red", services=["service"])
+
+    assert mock_create.called, "the vm was not created"
+    assert not mock_clone.called, "the vm was cloned, instead of created"
+    assert not mock_vm_prefs.called, "prefs were set, but none were given"
+    assert mock_enable_services.called, "services were not enabled, but one was given"
+
+
+@patch("qsm.dom0.enable_services", return_value=None, autospec=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospec=True)
+@patch("qsm.dom0.clone", return_value=None, autospec=True)
+@patch("qsm.dom0.create", return_value=None, autospec=True)
+def test_create_vm_jobs_are_called(mock_create, mock_clone, mock_vm_prefs, mock_enable_services):
+    _job_one = MagicMock()
+    _job_two = MagicMock()
+    _jobs = [lambda: _job_one(), lambda: _job_two()]
+    dom0.create_vm("new-vm", "red", jobs=_jobs)
+
+    assert mock_create.called, "the vm was not created"
+    assert not mock_clone.called, "the vm was cloned, instead of created"
+    assert not mock_vm_prefs.called, "prefs were set, but none were given"
+    assert not mock_enable_services.called, "services were enabled, but none were given"
+
+    assert _job_one.called, "job one wasn't called"
+    assert _job_one.called, "job two wasn't called"

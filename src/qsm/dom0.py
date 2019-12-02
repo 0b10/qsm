@@ -238,7 +238,8 @@ def _merge_prefs(prefs, label):
 
 
 def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None):
-    assert type(prefs) is dict or prefs is None, "prefs should be a dict, or None"
+    assert type(
+        prefs) is dict or prefs is None, "prefs should be a dict, or None"
 
     _prefs = prefs
 
@@ -249,7 +250,7 @@ def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None
         create(name, label)
 
     if _prefs:
-        prefs(name, _prefs)
+        vm_prefs(name, _prefs)
 
     if services:
         enable_services(name, services)
