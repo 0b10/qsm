@@ -6,7 +6,7 @@ from qsm.constants import (GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND, QVM_CH
 
 
 def exists(target):
-    _command = "qvm-check --quiet {} 2>&1 >/dev/null".format(target)
+    _command = "qvm-check --quiet {} 2>/dev/null".format(target)
     try:
         run(command=_command, target="dom0", user="root")
     except QsmProcessError as error:
@@ -42,7 +42,7 @@ def not_exists_or_throws(target, message=None):
 
 
 def is_running(target):
-    _command = "qvm-check --quiet --running {} >/dev/null".format(
+    _command = "qvm-check --quiet --running {} 2>/dev/null".format(
         target)
     try:
         run(command=_command, target="dom0", user="root")
@@ -134,16 +134,16 @@ def stop(target, timeout=120):
     print_sub_warning("{} already stopped".format(target))
 
 
+# TODO: check exists
 def remove(target, shutdown_ok=False):
     print_header("removing {}".format(target))
 
-    if shutdown_ok:
-        stop(target)
-    else:
-        is_stopped_or_throws(target)
-
     _command = "qvm-remove --quiet --force {}".format(target)
     if exists(target):  # pep.. shhh
+        if shutdown_ok:
+            stop(target)
+        else:
+            is_stopped_or_throws(target)
         run(command=_command, target="dom0", user="root")
 
     print_sub("{} removal finished".format(target))
