@@ -1,7 +1,7 @@
 from qsm.lib import (print_header, print_sub, parse_packages, run, QsmProcessError,
                      print_sub_warning, QsmDomainDoesntExistError, QsmDomainAlreadyExistError,
                      QsmDomainRunningError, QsmDomainStoppedError)
-from qsm.constants import (GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING,
+from qsm.constants import (QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING,
                            QVM_CREATE_DOMAIN_ALREADY_EXISTS)
 
 
@@ -85,7 +85,8 @@ def create(name, label, options=None, exists_ok=True):
 
     if exists_ok:
         try:
-            run(command=_command, target="dom0", user="root", show_message=False)
+            run(command=_command, target="dom0",
+                user="root", show_message=False)
         except QsmProcessError as error:
             if error.returncode != QVM_CREATE_DOMAIN_ALREADY_EXISTS:  # is not exit code 1
                 # some other error occurred
@@ -134,7 +135,6 @@ def stop(target, timeout=120):
     print_sub_warning("{} already stopped".format(target))
 
 
-# TODO: check exists
 def remove(target, shutdown_ok=False):
     print_header("removing {}".format(target))
 
@@ -164,7 +164,7 @@ def clone(source, target):
 
 
 def enable_services(target, services):
-    print(GREEN+"enabling"+WHITE+" services on {}...".format(target))
+    print_header("enabling services on {}...".format(target))
     exists_or_throws(target)
 
     for _service in services:
@@ -175,11 +175,12 @@ def enable_services(target, services):
 
 
 def disable_services(target, services):
-    print(RED+"disabling"+WHITE+" services on {}...".format(target))
+    print_header("disabling services on {}...".format(target))
     exists_or_throws(target)
 
     for _service in services:
-        _command = "qvm-service --disable {} {}".format(target, _service, show_message=False)
+        _command = "qvm-service --disable {} {}".format(
+            target, _service, show_message=False)
         run(command=_command, target="dom0", user="root", show_message=False)
 
         print_sub("{}".format(_service))
