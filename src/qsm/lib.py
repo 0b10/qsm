@@ -168,9 +168,8 @@ class VmPrefsBuilder:
         return self
 
     def kernel(self, value):
-        # TODO: regex, kernel version numbers
-        assert is_meaningful_string(
-            value), "kernel must be a non-empty string"
+        assert re.search(constants.RE_KERNEL_VERSION, value), \
+            "kernel is invalid - it should be number, dots, and dashes: {}".format(value)
         self._prefs["kernel"] = value
         return self
 

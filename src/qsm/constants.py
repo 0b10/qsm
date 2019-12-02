@@ -31,5 +31,8 @@ QVM_CHECK_EXISTS_NOT_FOUND = 2
 QVM_CHECK_IS_NOT_RUNNING = 1
 QVM_CREATE_DOMAIN_ALREADY_EXISTS = 1
 
-LABELS = ["red", "orange", "yellow", "green", "gray", "blue", "purple", "black"]
+LABELS = ["red", "orange", "yellow", "green",
+          "gray", "blue", "purple", "black"]
 VIRT_MODES = ["pvh", "hvm", "pv"]
+
+RE_KERNEL_VERSION = r"^[-.0-9]+$"
