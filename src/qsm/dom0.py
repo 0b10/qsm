@@ -85,7 +85,8 @@ def is_stopped_or_throws(target, message=None):
 def create(name, label, options="", exists_ok=True):
     print_header("creating vm {}".format(name))
 
-    _command = "qvm-create --label {} {} {}".format(label, options, name)
+    _command = "qvm-create --quiet --label {} {} {} 2>/dev/null".format(
+        label, options, name)
 
     if exists_ok:
         try:
