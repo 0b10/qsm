@@ -57,7 +57,6 @@ class QsmProcessError(Exception):
     """
     Raised when a process returns a non-zero exit status.
     """
-
     def __init__(self, returncode):
         self.returncode = returncode
 
@@ -71,27 +70,27 @@ class QsmPreconditionError(Exception):
 
 class QsmDomainRunningError(Exception):
     """
-    Raised when a domain is running when it shouldn't be.
+    Raised when a domain is running but it shouldn't be.
     """
     pass
 
 
 class QsmDomainStoppedError(Exception):
     """
-    Raised when a domain is stopped when it shouldn't be.
+    Raised when a domain is stopped but it shouldn't be.
     """
     pass
 
 
 class QsmDomainDoesntExistError(Exception):
     """
-    Raised when a domain doesn't exist when it should.
+    Raised when a domain doesn't exist but it should.
     """
     pass
 
 
 class QsmDomainAlreadyExistError(Exception):
     """
-    Raised when a domain exist when it shouldn't.
+    Raised when a domain exists but it shouldn't.
     """
     pass

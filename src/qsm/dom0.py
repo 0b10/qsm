@@ -85,7 +85,7 @@ def create(name, label, options=None, exists_ok=True):
 
     if exists_ok:
         try:
-            run(command=_command, target="dom0", user="root")
+            run(command=_command, target="dom0", user="root", show_message=False)
         except QsmProcessError as error:
             if error.returncode != QVM_CREATE_DOMAIN_ALREADY_EXISTS:  # is not exit code 1
                 # some other error occurred
@@ -104,7 +104,7 @@ def vm_prefs(target, prefs):
 
     for _key, _value in prefs.items():
         _command = "qvm-prefs -s {} {} \'{}\'".format(target, _key, _value)
-        run(command=_command, target="dom0", user="root")
+        run(command=_command, target="dom0", user="root", show_message=False)
 
         print_sub("{}: {}".format(_key, _value))
 
@@ -114,7 +114,7 @@ def start(target):
     exists_or_throws(target)
 
     _command = "qvm-start --skip-if-running {}".format(target)
-    run(command=_command, target="dom0", user="root")
+    run(command=_command, target="dom0", user="root", show_message=False)
 
     print_sub("{} started".format(target))
 
@@ -126,7 +126,7 @@ def stop(target, timeout=120):
     if is_running(target):
         _command = "qvm-shutdown --wait --timeout {} {}".format(
             timeout, target)
-        run(command=_command, target="dom0", user="root")
+        run(command=_command, target="dom0", user="root", show_message=False)
 
         print_sub("{} stopped".format(target))
         return
@@ -144,7 +144,7 @@ def remove(target, shutdown_ok=False):
             stop(target)
         else:
             is_stopped_or_throws(target)
-        run(command=_command, target="dom0", user="root")
+        run(command=_command, target="dom0", user="root", show_message=False)
 
         print_sub("{} removal finished".format(target))
         return
@@ -158,7 +158,7 @@ def clone(source, target):
     not_exists_or_throws(target)
 
     _command = "qvm-clone {} {}".format(source, target)
-    run(command=_command, target="dom0", user="root")
+    run(command=_command, target="dom0", user="root", show_message=False)
 
     print_sub("{} created".format(target))
 
@@ -180,7 +180,7 @@ def disable_services(target, services):
 
     for _service in services:
         _command = "qvm-service --disable {} {}".format(target, _service, show_message=False)
-        run(command=_command, target="dom0", user="root")
+        run(command=_command, target="dom0", user="root", show_message=False)
 
         print_sub("{}".format(_service))
 
