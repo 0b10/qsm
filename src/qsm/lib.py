@@ -162,8 +162,7 @@ class VmPrefsBuilder:
 
     def gateway(self, value):
         # TODO: contrain ip
-        assert is_meaningful_string(
-            value), "gateway must be a non-empty string"
+        assert is_ipv4(value), "gateway should be an ipv4 address"
         self._prefs["gateway"] = value
         return self
 
@@ -299,9 +298,8 @@ class VmPrefsBuilder:
         return self
 
     def visible_gateway(self, value):
-        # TODO: constrain by IP
-        assert is_meaningful_string(
-            value), "visible_gateway must be a non-empty string"
+        assert is_ipv4(value), \
+            "visible_gateway should be an ipv4 address: {}".format(value)
         self._prefs["visible_gateway"] = value
         return self
 
@@ -313,9 +311,8 @@ class VmPrefsBuilder:
         return self
 
     def visible_ip(self, value):
-        # TODO: constrain by IP
-        assert is_meaningful_string(
-            value), "visible_ip must be a non-empty string"
+        assert is_ipv4(value), \
+            "visible_ip should be an ipv4 address: {}".format(value)
         self._prefs["visible_ip"] = value
         return self
 
@@ -327,7 +324,8 @@ class VmPrefsBuilder:
         return self
 
     def visible_netmask(self, value):
-        # TODO: constrain by IP
+        assert is_ipv4(value), \
+            "visible_netmask is invalid: {}".format(value)
         assert is_meaningful_string(
             value), "visible_netmask must be a non-empty string"
         self._prefs["visible_netmask"] = value
