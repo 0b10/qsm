@@ -100,7 +100,7 @@ def git_pull(repo, repo_name, store_dir):
 
         try:
             chdir(_local_repo)
-            call("git status 2&>1 > /dev/null", shell=True)
+            call("git status 2>&1 > /dev/null", shell=True)
         except FileNotFoundError:
             print("repo doesn't exist: {1}")
             chdir(_store_dir)

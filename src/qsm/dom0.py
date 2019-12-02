@@ -1,24 +1,27 @@
 from qsm.lib import (print_header, print_sub, parse_packages, run, QsmProcessError,
                      print_sub_warning, QsmDomainDoesntExistError, QsmDomainAlreadyExistError,
                      QsmDomainRunningError, QsmDomainStoppedError)
-from qsm.constants import GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND
+from qsm.constants import (GREEN, WHITE, RED, QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING,
+                           QVM_CREATE_DOMAIN_ALREADY_EXISTS)
 
 
 def exists(target):
-    _command = "qvm-check --quiet {} 2&>1 >/dev/null".format(target)
+    _command = "qvm-check --quiet {} 2>&1 >/dev/null".format(target)
     try:
         run(command=_command, target="dom0", user="root")
     except QsmProcessError as error:
-        if error.returncode != QVM_CHECK_EXISTS_NOT_FOUND:
+        if error.returncode != QVM_CHECK_EXISTS_NOT_FOUND:  # is not exit code 2
+            # some other error occurred
             print_sub("a problem occurred when checking if {} exists".format(
                 target), failed=True)
             raise error
-        return False
+        return False  # is exit code 2 == domain doesn't exist
     return True
 
 
 def exists_or_throws(target, message=None):
-    _message = "{} doesn't exist".format(target) if message is None else message
+    _message = "{} doesn't exist".format(
+        target) if message is None else message
 
     if exists(target):
         return True
@@ -28,7 +31,8 @@ def exists_or_throws(target, message=None):
 
 
 def not_exists_or_throws(target, message=None):
-    _message = "{} doesn't exist".format(target) if message is None else message
+    _message = "{} doesn't exist".format(
+        target) if message is None else message
 
     if not exists(target):
         return True
@@ -43,16 +47,18 @@ def is_running(target):
     try:
         run(command=_command, target="dom0", user="root")
     except QsmProcessError as error:
-        if error.returncode != 1:  # 1 is "domain is running"
+        if error.returncode != QVM_CHECK_IS_NOT_RUNNING:  # is not exit code 1
+            # some other error occurred
             print_sub("a problem occurred when checking if {} is running".format(
                 target), failed=True)
             raise error
-        return False
+        return False  # is exit code 1 == domain is not running
     return True
 
 
 def is_running_or_throws(target, message=None):
-    _message = "{} is not running".format(target) if message is None else message
+    _message = "{} is not running".format(
+        target) if message is None else message
 
     if is_running(target):
         return True
@@ -81,7 +87,8 @@ def create(name, label, options=None, exists_ok=True):
         try:
             run(command=_command, target="dom0", user="root")
         except QsmProcessError as error:
-            if error.returncode != 1:  # 1 is "already exists"
+            if error.returncode != QVM_CREATE_DOMAIN_ALREADY_EXISTS:  # is not exit code 1
+                # some other error occurred
                 raise error
     else:
         not_exists_or_throws(name)
