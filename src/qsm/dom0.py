@@ -13,7 +13,7 @@ def create(name, label, options=None):
     print_sub("{} created".format(name))
 
 
-def set_prefs(target, options):
+def vm_prefs(target, options):
     print_header("setting prefs for {}".format(target))
 
     for _option, _value in options.items():
