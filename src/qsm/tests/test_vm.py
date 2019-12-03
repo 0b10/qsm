@@ -23,7 +23,7 @@
 from qsm.vm import update, install, uninstall
 from unittest.mock import patch
 import re
-from qsm import vm
+from qsm import vm, constants
 import hypothesis
 from hypothesis import strategies as s
 import pytest
@@ -202,3 +202,19 @@ def test_vm_prefs_builder_arbitrary_strings_negative_fuzz(_arbitrary_string_meth
     for _method in _arbitrary_string_methods:
         with pytest.raises(AssertionError):
             _method(value)
+
+
+# ~~~ arbitrary strings ~~~
+@pytest.mark.parametrize("virt_mode", constants.VIRT_MODES)
+def test__vm_prefs__builder__virt_mode__happy_path(virt_mode):
+    """Test all valid virt modes."""
+    _prefs = vm.VmPrefsBuilder()
+    assert _prefs.virt_mode(virt_mode), "should accept any valid virt mode"
+
+
+@hypothesis.given(s.one_of(s.booleans(), s.text(), s.integers()))
+def test__vm_prefs__builder__virt_mode__negative_fuzz(value):
+    """Fuzz test invalid values for virt mode"""
+    _prefs = vm.VmPrefsBuilder()
+    with pytest.raises(AssertionError):
+        _prefs.virt_mode(value)
