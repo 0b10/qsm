@@ -324,3 +324,39 @@ def test__vm_prefs__builder__mac__negative_fuzz(value):
     _prefs = vm.VmPrefsBuilder()
     with pytest.raises(AssertionError):
         _prefs.mac(value)
+
+
+# ~~~ memory/maxmem ~~~
+_mem_positive = [
+    # memory | maxmem
+    (1, 2),
+    (2, 3),
+    (20, 30),
+    (2000, 3000),
+]
+@pytest.mark.parametrize("memory,maxmem", _mem_positive)
+def test__vm_prefs__builder__mem__happy_path(memory, maxmem):
+    """Test that maxmem > memory passes when built."""
+    _prefs = vm.VmPrefsBuilder()\
+        .maxmem(maxmem)\
+        .memory(memory)
+
+    assert type(_prefs.build()) is dict, "should pass if maxmem > memory"
+
+
+_mem_negative = [
+    # memory | maxmem
+    (1, 1),
+    (3, 2),
+    (20, 18),
+    (2000, 1500),
+]
+@pytest.mark.parametrize("memory,maxmem", _mem_negative)
+def test__vm_prefs__builder__mem__negative(memory, maxmem):
+    """Test that maxmem > memory passes when built."""
+    _prefs = vm.VmPrefsBuilder()\
+        .maxmem(maxmem)\
+        .memory(memory)
+
+    with pytest.raises(AssertionError):
+        _prefs.build()
