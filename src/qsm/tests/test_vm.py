@@ -301,3 +301,26 @@ def test__vm_prefs__builder__label__negative_fuzz(value):
     _prefs = vm.VmPrefsBuilder()
     with pytest.raises(AssertionError):
         _prefs.label(value)
+
+
+# ~~~ mac ~~~
+_macs = [
+    "27:ab:27:e0:e7:11",
+    "00:00:00:00:00:00",
+    "ff:ff:ff:ff:ff:ff",
+    "27:11:BB:AA:FF:FF",
+    "0E:1e:e2:A1:2E:FF",
+]
+@pytest.mark.parametrize("value", _macs)
+def test__vm_prefs__builder__mac__happy_path(value):
+    """Test some valid mac addresses."""
+    _prefs = vm.VmPrefsBuilder()
+    assert _prefs.mac(value), "should accept a valid mac address"
+
+
+@hypothesis.given(s.one_of(s.booleans(), s.text(), s.integers()))
+def test__vm_prefs__builder__mac__negative_fuzz(value):
+    """Fuzz test invalid types for mac"""
+    _prefs = vm.VmPrefsBuilder()
+    with pytest.raises(AssertionError):
+        _prefs.mac(value)
