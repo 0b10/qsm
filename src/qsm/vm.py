@@ -110,10 +110,10 @@ class VmPrefsBuilder:
         self._prefs["mac"] = value
         return self
 
-    def management_dispv(self, value):
+    def management_dispvm(self, value):
         assert lib.is_meaningful_string(value), \
-            "management_dispv must be a non-empty string: {}".format(value)
-        self._prefs["management_dispv"] = value
+            "management_dispvm must be a non-empty string: {}".format(value)
+        self._prefs["management_dispvm"] = value
         return self
 
     def maxmem(self, value):

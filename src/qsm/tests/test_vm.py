@@ -157,22 +157,48 @@ def test_uninstall_excutes_on_correct_target():
 
 
 # >>> VmPrefsBuilder >>>
-@hypothesis.given(s.booleans())
-def test_vm_prefs_builder_bools_happy_fuzz(value):
+# ~~~ boolean ~~~
+@pytest.fixture
+def _boolean_methods():
     _prefs = vm.VmPrefsBuilder()
-    _methods = [_prefs.autostart, _prefs.debug, _prefs.include_in_backups,
-                _prefs.provides_network, _prefs.template_for_dispvms]
+    return [_prefs.autostart, _prefs.debug, _prefs.include_in_backups,
+            _prefs.provides_network, _prefs.template_for_dispvms]
 
-    for _method in _methods:
+
+@pytest.fixture
+def _arbitrary_string_methods():
+    _prefs = vm.VmPrefsBuilder()
+    return [_prefs.default_dispvm, _prefs.default_user,
+            _prefs.kernel_opts, _prefs.management_dispvm,
+            _prefs.name, _prefs.netvm, _prefs.template]
+
+
+@hypothesis.given(s.booleans())
+def test_vm_prefs_builder_bools_happy_fuzz(_boolean_methods, value):
+    for _method in _boolean_methods:
         assert _method(value), "should accept a boolean"
 
 
 @hypothesis.given(s.one_of(s.text(), s.complex_numbers(), s.decimals()))
-def test_vm_prefs_builder_bools_negative_fuzz(value):
-    _prefs = vm.VmPrefsBuilder()
-    _methods = [_prefs.autostart, _prefs.debug, _prefs.include_in_backups,
-                _prefs.provides_network, _prefs.template_for_dispvms]
+def test_vm_prefs_builder_bools_negative_fuzz(_boolean_methods, value):
+    for _method in _boolean_methods:
+        with pytest.raises(AssertionError):
+            _method(value)
 
-    for _method in _methods:
+
+# ~~~ arbitrary strings ~~~
+# any text, except '', line-terminators, and spaces.
+# ! The regex for line terminators is broken, won't fix. don't know how. It's good enough.
+@hypothesis.given(s.text(alphabet=s.characters(blacklist_characters=[' ', '\n']), min_size=1))
+def test_vm_prefs_builder_arbitrary_strings_happy_fuzz(_arbitrary_string_methods, value):
+    # strings should be accepted, as long as they aren't empty, or only spaces
+    for _method in _arbitrary_string_methods:
+        assert _method(value), "should accept an arbitrary string"
+
+
+@hypothesis.given(s.one_of(s.booleans(), s.integers(), s.none()))
+def test_vm_prefs_builder_arbitrary_strings_negative_fuzz(_arbitrary_string_methods, value):
+    # non-strings should throw
+    for _method in _arbitrary_string_methods:
         with pytest.raises(AssertionError):
             _method(value)
