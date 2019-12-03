@@ -117,13 +117,13 @@ class VmPrefsBuilder:
         return self
 
     def maxmem(self, value):
-        assert isinstance(value, int) and value > 0, \
+        assert type(value) is int and value > 0, \
             "maxmem must be an integer > 0: {}".format(value)
         self._prefs["maxmem"] = value
         return self
 
     def memory(self, value):
-        assert isinstance(value, int) and value > 0, \
+        assert type(value) is int and value > 0, \
             "memory must be an integer > 0: {}".format(value)
         self._prefs["memory"] = value
         return self
@@ -147,14 +147,14 @@ class VmPrefsBuilder:
         return self
 
     def qrexec_timeout(self, value=120):
-        assert isinstance(value, int) and value > 0, \
+        assert type(value) is int and value > 0, \
             "qrexec_timeout must be an integer > 0: {}".format(
                 value)
         self._prefs["qrexec_timeout"] = value
         return self
 
     def shutdown_timeout(self, value=120):
-        assert isinstance(value, int) and value > 0, \
+        assert type(value) is int and value > 0, \
             "shutdown_timeout must be an integer > 0: {}".format(value)
         self._prefs["shutdown_timeout"] = value
         return self

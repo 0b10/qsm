@@ -173,6 +173,13 @@ def _arbitrary_string_methods():
             _prefs.name, _prefs.netvm, _prefs.template]
 
 
+@pytest.fixture
+def _positive_integer_methods():
+    _prefs = vm.VmPrefsBuilder()
+    return [_prefs.vcpus, _prefs.shutdown_timeout, _prefs.qrexec_timeout,
+            _prefs.memory, _prefs.maxmem]
+
+
 @hypothesis.given(s.booleans())
 def test_vm_prefs_builder_bools_happy_fuzz(_boolean_methods, value):
     for _method in _boolean_methods:
@@ -218,3 +225,29 @@ def test__vm_prefs__builder__virt_mode__negative_fuzz(value):
     _prefs = vm.VmPrefsBuilder()
     with pytest.raises(AssertionError):
         _prefs.virt_mode(value)
+
+
+# ~~~ positive integers ~~~
+@hypothesis.given(s.integers(1))
+@hypothesis.example(1)
+def test__vm_prefs__builder__vcpus__happy_path(_positive_integer_methods, value):
+    """Fuzz test all methods that accept positive integers"""
+    for _method in _positive_integer_methods:
+        assert _method(value), "should accept any positive integer"
+
+
+@hypothesis.given(s.integers(-10000, 0))
+@hypothesis.example(0)
+def test__vm_prefs__builder__virt_mode__negative_integer_fuzz(_positive_integer_methods, value):
+    """Fuzz test all methods that reject integers <= 0"""
+    for _method in _positive_integer_methods:
+        with pytest.raises(AssertionError):
+            _method(value)
+
+
+@hypothesis.given(s.one_of(s.booleans(), s.text(), s.complex_numbers()))
+def test__vm_prefs__builder__virt_mode__random_type_negative_fuzz(_positive_integer_methods, value):
+    """Fuzz test (random types) for all methods that accept only positive integers"""
+    for _method in _positive_integer_methods:
+        with pytest.raises(AssertionError):
+            _method(value)
