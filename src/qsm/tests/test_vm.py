@@ -211,22 +211,6 @@ def test_vm_prefs_builder_arbitrary_strings_negative_fuzz(_arbitrary_string_meth
             _method(value)
 
 
-# ~~~ arbitrary strings ~~~
-@pytest.mark.parametrize("virt_mode", constants.VIRT_MODES)
-def test__vm_prefs__builder__virt_mode__happy_path(virt_mode):
-    """Test all valid virt modes."""
-    _prefs = vm.VmPrefsBuilder()
-    assert _prefs.virt_mode(virt_mode), "should accept any valid virt mode"
-
-
-@hypothesis.given(s.one_of(s.booleans(), s.text(), s.integers()))
-def test__vm_prefs__builder__virt_mode__negative_fuzz(value):
-    """Fuzz test invalid values for virt mode"""
-    _prefs = vm.VmPrefsBuilder()
-    with pytest.raises(AssertionError):
-        _prefs.virt_mode(value)
-
-
 # ~~~ positive integers ~~~
 @hypothesis.given(s.integers(1))
 @hypothesis.example(1)
@@ -285,3 +269,35 @@ def test__vm_prefs__builder__kernel__negative_random_type_fuzz(value):
     with pytest.raises(AssertionError):
         assert _prefs.kernel(value), \
             "should accept integers, dots, and dashes as a string"
+
+
+# ~~~  virt_mode ~~~
+@pytest.mark.parametrize("virt_mode", constants.VIRT_MODES)
+def test__vm_prefs__builder__virt_mode__happy_path(virt_mode):
+    """Test all valid virt modes."""
+    _prefs = vm.VmPrefsBuilder()
+    assert _prefs.virt_mode(virt_mode), "should accept any valid virt mode"
+
+
+@hypothesis.given(s.one_of(s.booleans(), s.text(), s.integers()))
+def test__vm_prefs__builder__virt_mode__negative_fuzz(value):
+    """Fuzz test invalid values for virt mode"""
+    _prefs = vm.VmPrefsBuilder()
+    with pytest.raises(AssertionError):
+        _prefs.virt_mode(value)
+
+
+# ~~~ labels ~~~
+@pytest.mark.parametrize("value", constants.LABELS)
+def test__vm_prefs__builder__label__happy_path(value):
+    """Test all valid labels."""
+    _prefs = vm.VmPrefsBuilder()
+    assert _prefs.label(value), "should accept any valid label"
+
+
+@hypothesis.given(s.one_of(s.booleans(), s.text(), s.integers()))
+def test__vm_prefs__builder__label__negative_fuzz(value):
+    """Fuzz test invalid values for label"""
+    _prefs = vm.VmPrefsBuilder()
+    with pytest.raises(AssertionError):
+        _prefs.label(value)
