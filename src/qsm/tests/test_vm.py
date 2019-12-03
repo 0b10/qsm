@@ -251,3 +251,37 @@ def test__vm_prefs__builder__virt_mode__random_type_negative_fuzz(_positive_inte
     for _method in _positive_integer_methods:
         with pytest.raises(AssertionError):
             _method(value)
+
+
+# ~~~ kernel version ~~~
+_kernel_versions = [
+    "1.1.8-1",
+    "123.1321.23-1",
+    "123.1321-23.1",
+    "123-138271-2332.123",
+    "0"
+    "0.1"
+    "3281798370928"
+]
+@pytest.mark.parametrize("value", _kernel_versions)
+def test__vm_prefs__builder__kernel__happy_path(value):
+    """Test strings composed of numbers, dots, and dashes"""
+    _prefs = vm.VmPrefsBuilder()
+    assert _prefs.kernel(value), \
+        "should accept integers, dots, and dashes as a string"
+
+
+_kernel_blacklisted_chars = [
+    ".", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+]
+_kernel_text_strat = s.text(alphabet=s.characters(
+    blacklist_characters=_kernel_blacklisted_chars))
+
+
+@hypothesis.given(s.one_of(_kernel_text_strat, s.integers(), s.booleans()))
+def test__vm_prefs__builder__kernel__negative_random_type_fuzz(value):
+    """Fuzz test all values that blow up kernel"""
+    _prefs = vm.VmPrefsBuilder()
+    with pytest.raises(AssertionError):
+        assert _prefs.kernel(value), \
+            "should accept integers, dots, and dashes as a string"

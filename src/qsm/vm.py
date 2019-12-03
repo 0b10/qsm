@@ -85,8 +85,8 @@ class VmPrefsBuilder:
         return self
 
     def kernel(self, value):
-        assert re.search(constants.RE_KERNEL_VERSION, value), \
-            "kernel should be numbers, dots, and dashes: {}".format(
+        assert isinstance(value, str) and re.search(constants.RE_KERNEL_VERSION, value), \
+            "kernel should be a string of numbers, dots, and dashes: {}".format(
                 value)
         self._prefs["kernel"] = value
         return self
