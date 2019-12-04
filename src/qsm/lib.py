@@ -92,9 +92,25 @@ def is_ipv4(value):
     return True
 
 
+def is_ipv4_network(value):
+    try:
+        ipaddress.IPv4Network(value)
+    except ipaddress.AddressValueError:
+        return False
+    return True
+
+
 def is_ipv6(value):
     try:
         ipaddress.IPv6Address(value)
+    except ipaddress.AddressValueError:
+        return False
+    return True
+
+
+def is_ipv6_network(value):
+    try:
+        ipaddress.IPv6Network(value)
     except ipaddress.AddressValueError:
         return False
     return True
