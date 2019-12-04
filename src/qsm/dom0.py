@@ -220,7 +220,15 @@ def disable_services(target, services):
         print_sub("{}".format(_service))
 
 
+def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
+    _command = "qvm-firewall {0} add action={1} dsthost={2} proto={3}"\
+        .format(target, action, dsthost, proto)
+
+    if icmptype:
+        _command += " icmptype={}".format(icmptype)
+
 # >>> PACKAGE MANAGER >>>
+
 
 def update():
     print_header("updating dom0")
