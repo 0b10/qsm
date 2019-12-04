@@ -224,12 +224,21 @@ def disable_services(target, services):
         lib.print_sub("{}".format(_service))
 
 
-def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
-    _command = "qvm-firewall {0} add action={1} dsthost={2} proto={3}"\
-        .format(target, action, dsthost, proto)
+# def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
+#     assert exists_or_throws(target)
+#     assert action in ["accept", "drop"], \
+#         "action should be accept or drop: {}".format(action)
+#     assert type(dstports) is int and 1 <= dstports <= 65535,
+#         "invalid port range for dstports"
+#     assert lib.is_ip(dsthost), \
+#         "dsthost should be a valid ip address: {}".format(dsthost)
 
-    if icmptype:
-        _command += " icmptype={}".format(icmptype)
+
+#     _command = "qvm-firewall {0} add action={1} dsthost={2} proto={3}"\
+#         .format(target, action, dsthost, proto)
+
+#     if icmptype:
+#         _command += " icmptype={}".format(icmptype)
 
 # >>> PACKAGE MANAGER >>>
 

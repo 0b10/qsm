@@ -129,6 +129,21 @@ def is_mac(value):
     return re.search(constants.RE_MAC_ADDRESS, value)
 
 
+def assert_valid_dstports(value):
+    assert type(value), "dstports must be a string: {}".format(value)
+    assert re.search("^[-,0-9]+$", value), \
+        "invalid chars found for dstports - use - , or integers only: {}"
+    ports = value.replace("-", ",").split(",")
+
+    try:
+        assert all([1 <= int(x) <= 65535 for x in ports]), \
+            "dstport value must be between 1 - 65535: {}".format(value)
+    except ValueError:
+        raise AssertionError(
+            "an incastable value exists in dstports: {}".format(value))
+    return True
+
+
 class QsmProcessError(Exception):
     """
     Raised when a process returns a non-zero exit status.

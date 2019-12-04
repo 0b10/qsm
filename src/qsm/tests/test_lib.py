@@ -25,6 +25,7 @@ from unittest.mock import patch
 import re
 import hypothesis
 import faker
+import pytest
 import hypothesis.strategies as s
 from faker import providers
 
@@ -191,6 +192,73 @@ def test__is_ip__not_net__negative():
     for ip in test_cases:
         assert not lib.is_ip(ip, network=False), \
             "should return False for {}".format(ip)
+
+
+@pytest.mark.parametrize("value", [
+    "1",
+    "1,2",
+    "1-2",
+    "1-2,3",
+    "4,1-2,3",
+    "65535",
+    "65534-65535",
+    "2000,65534-65535",
+])
+def test__assert_valid_dstports__happy_path(value):
+    assert lib.assert_valid_dstports(value), \
+        "{} should return True".format(value)
+
+
+@pytest.mark.parametrize("value", [
+    "1 ",
+    "1+2",
+    "65536",
+    "100000",
+    "0",
+    "-",
+    "-0",
+    "1-0",
+    "1--1",
+    "-1",
+])
+def test__assert_valid_dstports__negative(value):
+    with pytest.raises(AssertionError):
+        lib.assert_valid_dstports(value)
+
+
+_valid_ports_strat = s.integers(min_value=1, max_value=65535)
+@hypothesis.given(_valid_ports_strat, _valid_ports_strat, _valid_ports_strat)
+def test__assert_valid_dstports__happy_fuzz(one, two, three):
+    """Test a range of valid ports, in various configurations"""
+    cases = [
+        str(one),
+        "{},{}".format(one, two),
+        "{},{}-{}".format(one, two, three),
+        "{0},{1}-{2},{0}".format(one, two, three),
+        "{0},{1}-{2},{0}-{2},{0}".format(one, two, three)
+    ]
+
+    for case in cases:
+        assert lib.assert_valid_dstports(str(case)), \
+            "{} should return True".format(case)
+
+
+_invalid_ports_strat_1 = s.integers(min_value=65536, max_value=100000)
+_invalid_ports_strat_2 = s.integers(min_value=-100000, max_value=0)
+@hypothesis.given(_invalid_ports_strat_1, _invalid_ports_strat_2, _invalid_ports_strat_1)
+def test__assert_valid_dstports__negative_fuzz(one, two, three):
+    """Test a range of valid ports, in various configurations"""
+    cases = [
+        str(one),
+        "{},{}".format(one, two),
+        "{},{}-{}".format(one, two, three),
+        "{0},{1}-{2},{0}".format(one, two, three),
+        "{0},{1}-{2},{0}-{2},{0}".format(one, two, three)
+    ]
+
+    for case in cases:
+        with pytest.raises(AssertionError):
+            lib.assert_valid_dstports(str(case))
 
 
 @hypothesis.given(s.text())
