@@ -23,7 +23,8 @@
 from qsm.constants import GREEN, WHITE, RED, PURPLE, YELLOW
 from subprocess import check_call, CalledProcessError
 from qsm import constants
-import re, ipaddress
+import re
+import ipaddress
 
 # TODO: fix user for dom0, use local user
 
@@ -113,6 +114,14 @@ def is_ipv6_network(value):
     except ipaddress.AddressValueError:
         return False
     return True
+
+
+def is_ip(value, network=True):
+    no_net = any([is_ipv4(value), is_ipv6(value)])
+    net = False
+    if network:
+        net = any([is_ipv4_network(value), is_ipv6_network(value)])
+    return no_net or net
 
 
 def is_mac(value):

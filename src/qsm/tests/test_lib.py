@@ -149,6 +149,56 @@ def test__is_ipv6_network__fuzz_random_string(random_string):
         "should return False for {}".format(random_string)
 
 
+def test__is_ip__happy_path():
+    """Test that any valid ipv4/v6 address will return True for network addresses when network=True"""
+    fake = faker.Faker()
+    fake.add_provider(providers.internet)
+    test_cases = [
+        fake.ipv4(network=False),
+        fake.ipv4(network=True),
+        fake.ipv6(network=False),
+        fake.ipv6(network=True),
+    ]
+
+    for ip in test_cases:
+        assert lib.is_ip(ip, network=True), \
+            "should return True for {}".format(ip)
+
+
+def test__is_ip__network_true__happy_path():
+    """Test that any valid ipv4/v6 address will return True for non-network addresses when network=False"""
+    fake = faker.Faker()
+    fake.add_provider(providers.internet)
+    test_cases = [
+        fake.ipv4(network=False),
+        fake.ipv6(network=False),
+    ]
+
+    for ip in test_cases:
+        assert lib.is_ip(ip, network=False), \
+            "should return True for {}".format(ip)
+
+
+def test__is_ip__not_net__negative():
+    """Test that a network ip will cause False to be returned, when network=False"""
+    fake = faker.Faker()
+    fake.add_provider(providers.internet)
+    test_cases = [
+        fake.ipv4(network=True),
+        fake.ipv6(network=True),
+    ]
+
+    for ip in test_cases:
+        assert not lib.is_ip(ip, network=False), \
+            "should return False for {}".format(ip)
+
+
+@hypothesis.given(s.text())
+def test__is_ip__fuzz_random_string(random_string):
+    assert not lib.is_ip(random_string), \
+        "should return False for {}".format(random_string)
+
+
 # ~~~ is_meaningful_string() ~~~
 
 def test_is_meaningful_string_rejects_empty_string():
