@@ -24,6 +24,7 @@ from qsm.constants import GREEN, WHITE, RED, PURPLE, YELLOW
 from subprocess import check_call, CalledProcessError
 from qsm import constants
 import re
+import ipaddress
 
 # TODO: fix user for dom0, use local user
 
@@ -92,6 +93,14 @@ def is_ipv4(value):
             return False
         return len(_seg_bools) == 4 and all(_seg_bools)
     return False
+
+
+def is_ipv6(value):
+    try:
+        ipaddress.IPv6Address(value)
+    except ipaddress.AddressValueError:
+        return False
+    return True
 
 
 def is_mac(value):

@@ -24,7 +24,9 @@ from qsm import lib
 from unittest.mock import patch
 import re
 import hypothesis
+import faker
 import hypothesis.strategies as s
+from faker import providers
 
 
 def test_run_exists():
@@ -103,16 +105,27 @@ def test_is_ipv4_happy_boundaries():
             "{0}.{0}.{0}.{0} should be accepted".format(num)
 
 
+# ~~~ is_ipv6() ~~~
+def test__is_ipv6__happy_path():
+    fake = faker.Faker()
+    fake.add_provider(providers.internet)
+    for _ in range(50):
+        ip = fake.ipv6(network=False)
+        assert lib.is_ipv6(ip), \
+            "should return True for {}".format(ip)
+
+
 @hypothesis.given(s.text())
-def test_is_ipv4_random_string(random_string):
-    assert not lib.is_ipv4(random_string), \
-        "{} should be rejected".format(random_string)
+def test__is_ipv6__random_string(random_string):
+    assert not lib.is_ipv6(random_string), \
+        "should return False for {}".format(random_string)
+
 
 # ~~~ is_meaningful_string() ~~~
 
-
 def test_is_meaningful_string_rejects_empty_string():
-    assert not lib.is_meaningful_string(""), "an empty string should be rejected"
+    assert not lib.is_meaningful_string(
+        ""), "an empty string should be rejected"
 
 
 def test_is_meaningful_string_happy_path_fuzz():
@@ -120,7 +133,6 @@ def test_is_meaningful_string_happy_path_fuzz():
 
 
 # ~~~ is_mac() ~~~
-
 
 def test_is_mac_accepts_mac():
     assert lib.is_mac("00:01:36:12:e6:ff"), "should accept a mac address"
