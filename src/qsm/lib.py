@@ -84,44 +84,15 @@ def is_meaningful_string(value):
     return isinstance(value, str) and not re.search("^ *$", value)
 
 
-def is_ipv4(value):
-    try:
-        ipaddress.IPv4Address(value)
-    except ipaddress.AddressValueError:
-        return False
-    return True
-
-
-def is_ipv4_network(value):
-    try:
-        ipaddress.IPv4Network(value)
-    except ipaddress.AddressValueError:
-        return False
-    return True
-
-
-def is_ipv6(value):
-    try:
-        ipaddress.IPv6Address(value)
-    except ipaddress.AddressValueError:
-        return False
-    return True
-
-
-def is_ipv6_network(value):
-    try:
-        ipaddress.IPv6Network(value)
-    except ipaddress.AddressValueError:
-        return False
-    return True
-
-
 def is_ip(value, network=True):
-    no_net = any([is_ipv4(value), is_ipv6(value)])
-    net = False
-    if network:
-        net = any([is_ipv4_network(value), is_ipv6_network(value)])
-    return no_net or net
+    try:
+        if network:
+            ipaddress.ip_network(value)
+        else:
+            ipaddress.ip_address(value)
+    except (ipaddress.AddressValueError, ValueError):
+        return False
+    return True
 
 
 def is_mac(value):

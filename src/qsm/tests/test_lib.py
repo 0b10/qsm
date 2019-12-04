@@ -88,68 +88,7 @@ def test_domU_command_is_executed_as_root():
 
 
 # >>> PREDICATES >>>
-# ~~~ is_ipv4() ~~~
-def test__is_ipv4__happy_path():
-    fake = faker.Faker()
-    fake.add_provider(providers.internet)
-    for _ in range(50):
-        ip = fake.ipv4(network=False)
-        assert lib.is_ipv4(ip), \
-            "should return True for {}".format(ip)
-
-
-@hypothesis.given(s.text())
-def test__is_ipv4__fuzz_random_string(random_string):
-    assert not lib.is_ipv4(random_string), \
-        "should return False for {}".format(random_string)
-
-
-def test__is_ipv4_network__happy_path():
-    fake = faker.Faker()
-    fake.add_provider(providers.internet)
-    for _ in range(50):
-        ip = fake.ipv4(network=True)
-        assert lib.is_ipv4_network(ip), \
-            "should return True for {}".format(ip)
-
-
-@hypothesis.given(s.text())
-def test__is_ipv4_network__fuzz_random_string(random_string):
-    assert not lib.is_ipv4_network(random_string), \
-        "should return False for {}".format(random_string)
-
-
-# ~~~ is_ipv6() ~~~
-def test__is_ipv6__happy_path():
-    fake = faker.Faker()
-    fake.add_provider(providers.internet)
-    for _ in range(50):
-        ip = fake.ipv6(network=False)
-        assert lib.is_ipv6(ip), \
-            "should return True for {}".format(ip)
-
-
-@hypothesis.given(s.text())
-def test__is_ipv6__fuzz_random_string(random_string):
-    assert not lib.is_ipv6(random_string), \
-        "should return False for {}".format(random_string)
-
-
-def test__is_ipv6_network__happy_path():
-    fake = faker.Faker()
-    fake.add_provider(providers.internet)
-    for _ in range(50):
-        ip = fake.ipv6(network=True)
-        assert lib.is_ipv6_network(ip), \
-            "should return True for {}".format(ip)
-
-
-@hypothesis.given(s.text())
-def test__is_ipv6_network__fuzz_random_string(random_string):
-    assert not lib.is_ipv6_network(random_string), \
-        "should return False for {}".format(random_string)
-
-
+# ~~~ is_ip() ~~~
 def test__is_ip__happy_path():
     """Test that any valid ipv4/v6 address will return True for network addresses when network=True"""
     fake = faker.Faker()
