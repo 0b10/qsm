@@ -88,21 +88,19 @@ def test_domU_command_is_executed_as_root():
 
 # >>> PREDICATES >>>
 # ~~~ is_ipv4() ~~~
+def test__is_ipv4__happy_path():
+    fake = faker.Faker()
+    fake.add_provider(providers.internet)
+    for _ in range(50):
+        ip = fake.ipv4(network=False)
+        assert lib.is_ipv4(ip), \
+            "should return True for {}".format(ip)
 
-def test_is_ipv4_happy_path():
-    for num in range(0, 255):
-        assert lib.is_ipv4("{0}.{0}.{0}.{0}".format(num)), \
-            "{0}.{0}.{0}.{0} should be accepted".format(num)
 
-
-def test_is_ipv4_happy_boundaries():
-    for num in range(256, 300):
-        assert not lib.is_ipv4("{0}.{0}.{0}.{0}".format(num)), \
-            "{0}.{0}.{0}.{0} should be accepted".format(num)
-
-    for num in range(-50, -1):
-        assert not lib.is_ipv4("{0}.{0}.{0}.{0}".format(num)), \
-            "{0}.{0}.{0}.{0} should be accepted".format(num)
+@hypothesis.given(s.text())
+def test__is_ipv4__random_string(random_string):
+    assert not lib.is_ipv4(random_string), \
+        "should return False for {}".format(random_string)
 
 
 # ~~~ is_ipv6() ~~~
