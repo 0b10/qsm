@@ -23,8 +23,7 @@
 from qsm.constants import GREEN, WHITE, RED, PURPLE, YELLOW
 from subprocess import check_call, CalledProcessError
 from qsm import constants
-import re
-import ipaddress
+import re, ipaddress
 
 # TODO: fix user for dom0, use local user
 
