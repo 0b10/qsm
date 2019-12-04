@@ -85,14 +85,11 @@ def is_meaningful_string(value):
 
 
 def is_ipv4(value):
-    if is_meaningful_string(value):
-        try:
-            _seg_bools = [int and int(x) >= 0 and int(
-                x) <= 255 for x in value.split(".")]
-        except ValueError:
-            return False
-        return len(_seg_bools) == 4 and all(_seg_bools)
-    return False
+    try:
+        ipaddress.IPv4Address(value)
+    except ipaddress.AddressValueError:
+        return False
+    return True
 
 
 def is_ipv6(value):
