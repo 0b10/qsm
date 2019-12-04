@@ -224,21 +224,26 @@ def disable_services(target, services):
         lib.print_sub("{}".format(_service))
 
 
-# def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
-#     assert exists_or_throws(target)
-#     assert action in ["accept", "drop"], \
-#         "action should be accept or drop: {}".format(action)
-#     assert type(dstports) is int and 1 <= dstports <= 65535,
-#         "invalid port range for dstports"
-#     assert lib.is_ip(dsthost), \
-#         "dsthost should be a valid ip address: {}".format(dsthost)
+def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
+    assert exists_or_throws(target)
+    assert action in ["accept", "drop"], \
+        "action should be accept or drop: {}".format(action)
+    lib.assert_valid_dstports(dstports)
+    assert lib.is_ip(dsthost), \
+        "dsthost should be a valid ip address: {}".format(dsthost)
+    assert proto in ["tcp", "udp", "icmp"], \
+        "proto must be icmp, tcp, or udp: {}".format(proto)
 
+    _command = "qvm-firewall {0} add action={1} dsthost={2} proto={3}"\
+        .format(target, action, dsthost, proto)
 
-#     _command = "qvm-firewall {0} add action={1} dsthost={2} proto={3}"\
-#         .format(target, action, dsthost, proto)
+    if icmptype:
+        assert type(icmptype) is int and 0 <= icmptype <= 43, \
+            "icmptype must be an integer, 0 <= n <= 43: {}".format(icmptype)
+        assert proto == \
+            "icmp", "proto must be icmp if setting icmp type: {}".format(proto)
+        _command += " icmptype={}".format(icmptype)
 
-#     if icmptype:
-#         _command += " icmptype={}".format(icmptype)
 
 # >>> PACKAGE MANAGER >>>
 
