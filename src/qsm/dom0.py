@@ -229,7 +229,7 @@ def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
     assert action in ["accept", "drop"], \
         "action should be accept or drop: {}".format(action)
     lib.assert_valid_dstports(dstports)
-    assert lib.is_ip(dsthost), \
+    assert lib.is_ip(dsthost, network=True), \
         "dsthost should be a valid ip address: {}".format(dsthost)
     assert proto in ["tcp", "udp", "icmp"], \
         "proto must be icmp, tcp, or udp: {}".format(proto)
@@ -243,6 +243,8 @@ def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
         assert proto == \
             "icmp", "proto must be icmp if setting icmp type: {}".format(proto)
         _command += " icmptype={}".format(icmptype)
+
+    lib.run(_command, target, "user", show_message=False)
 
 
 # >>> PACKAGE MANAGER >>>

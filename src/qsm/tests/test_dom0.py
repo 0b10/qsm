@@ -24,6 +24,7 @@ from qsm import dom0, lib
 from unittest.mock import patch, MagicMock
 import pytest
 from qsm.constants import QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING
+import re
 
 
 # >>> exists() >>>
@@ -405,3 +406,42 @@ def test_create_vm_jobs_are_called(mock_create, mock_clone, mock_vm_prefs, mock_
 
     assert _job_one.called, "job one wasn't called"
     assert _job_one.called, "job two wasn't called"
+
+
+# >>> firewall() >>>
+
+
+@pytest.mark.parametrize("do,expected", [
+    # func | expected
+    # action=accept
+    (
+        lambda: dom0.firewall("test-vm", "accept", "192.168.1.1", "1"),
+        "qvm-firewall test-vm add action=accept dsthost=192.168.1.1 proto=tcp"
+    ),
+    # action=drop
+    (
+        lambda: dom0.firewall("test-vm", "drop", "192.168.1.1", "1"),
+        "qvm-firewall test-vm add action=drop dsthost=192.168.1.1 proto=tcp"
+    ),
+    # proto=udp
+    (
+        lambda: dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="udp"),
+        "qvm-firewall test-vm add action=accept dsthost=192.168.1.1 proto=udp"
+    ),
+    # proto=icmp
+    (
+        lambda: dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="icmp"),
+        "qvm-firewall test-vm add action=accept dsthost=192.168.1.1 proto=icmp"
+    ),
+    # # dsthost= /16
+    # (
+    #     lambda: dom0.firewall("test-vm", "accept", "192.168.1.1/16", "1", proto="tcp"),
+    #     "qvm-firewall test-vm add action=accept dsthost=192.168.1.1/16 proto=tcp"
+    # ),
+])
+def test__firewall__happy_path(do, expected):
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True) as mock_run:
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            do()
+            assert re.search(expected, str(mock_run.call_args)), \
+                "run was not called with expected args -- should be: {}".format(expected)
