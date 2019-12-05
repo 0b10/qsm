@@ -100,8 +100,45 @@ def is_stopped_or_throws(target, message=None):
     return True
 
 
-# >>> DOMAIN PROVISIONING >>>
+def is_template(target):
+    """
+    Check that a domain is a template.
 
+    This will return False if the domain doesn't exists.
+    """
+    _command = "qvm-check --quiet --template {} 2>/dev/null".format(target)
+
+    try:
+        lib.run(command=_command, target="dom0",
+                user="root", show_message=False)
+    except lib.QsmProcessError as error:
+        if error.returncode != constants.QVM_CHECK_DOMAIN_IS_A_TEMPLATE:  # is not exit code 0
+            return False
+    return True
+
+
+def is_template_or_throws(target):
+    exists_or_throws(target)  # because it provides a better error message
+    if not is_template(target):
+        message = "{} is not a template".format(target)
+        lib.print_sub(message, failed=True)
+        raise lib.QsmDomainIsNotATemplate(message)
+    return True
+
+
+def is_not_template_or_throws(target, must_exist=False):
+    if must_exist:
+        exists_or_throws(target)
+
+    if not is_template(target):
+        return True
+
+    message = "{} is a template".format(target)
+    lib.print_sub(message, failed=True)
+    raise lib.QsmDomainIsATemplate(message)
+
+
+# >>> DOMAIN PROVISIONING >>>
 def create(name, label, options="", exists_ok=True):
     lib.print_header("creating vm {}".format(name))
 

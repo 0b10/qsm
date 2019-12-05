@@ -160,3 +160,17 @@ class QsmDomainAlreadyExistError(Exception):
     Raised when a domain exists but it shouldn't.
     """
     pass
+
+
+class QsmDomainIsNotATemplate(Exception):
+    """
+    Raised when a domain is not a template, but should be.
+    """
+    pass
+
+
+class QsmDomainATemplate(Exception):
+    """
+    Raised when a domain is a template, but it shouldn't be.
+    """
+    pass
