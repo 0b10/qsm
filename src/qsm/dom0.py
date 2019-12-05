@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from qsm import lib, constants
+from qsm import lib, constants, vm
 import types
+import os
+import sys
 
 
 # >>> PREDICATES >>>
@@ -348,3 +350,65 @@ def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None
             "jobs should be a list of funcs/lambdas, that take no params: [lambda: my_func(param), ...]"
         for job in jobs:
             job()
+
+
+# TODO: make a config object
+config = {}
+config["data_dir"] = "/tmp/test"
+
+
+def read_packages_file(rel_path):
+    assert rel_path and isinstance(rel_path, str), \
+        "rel_path must be a non-empty string"
+    _path = os.path.join(config.data_dir, rel_path)
+    with open(_path, "r", encoding="utf8") as f:
+        try:
+            return f.read().replace("\n", " ").strip()  # make space separated values
+        except FileNotFoundError:
+            lib.print_sub("packages file doesn't exist: {}".format(_path), failed=True)
+            sys.exit(101)
+
+
+def create_template(
+        target, source_template, prefs=None, jobs=None, update=True, packages_file_path=None, shutdown=True):
+    lib.print_header("creating template '{}' from '{}'".format(target, source_template))
+
+    assert target != source_template, \
+        "target must not be the same as source template"
+
+    not_exists_or_throws(target)
+
+    if not exists(source_template):
+        install(source_template)
+        source_template_prefs = vm.VmPrefsBuilder()\
+            .label("gray")\
+            .include_in_backups(False)\
+            .build()
+        vm_prefs(source_template, source_template_prefs)
+    else:
+        is_template_or_throws(source_template)
+
+    clone(source_template, target)
+
+    target_prefs = vm.VmPrefsBuilder().label("black").build()
+    vm_prefs(target, target_prefs)
+
+    if prefs:
+        vm_prefs(target, prefs)
+
+    if update:
+        vm.update(target)
+
+    if packages_file_path:
+        packages = read_packages_file(packages_file_path)
+        vm.install(target, packages)
+
+    if jobs:
+        assert _is_all_funcs(jobs), \
+            "jobs should be a list of funcs/lambdas, that take no params: [lambda: my_func(param), ...]"
+        for job in jobs:
+            job()
+        lib.print_sub("jobs complete")
+
+    if shutdown:
+        stop(target)
