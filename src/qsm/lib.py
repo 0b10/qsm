@@ -57,7 +57,7 @@ def _run_dom0(command, target, user, show_message):
 
 
 def _run_domU(command, target, user, show_message, colour=36, err_colour=36):
-    # FIXME: qvm-run --pass-io seems to only pass to stderr, set both to the same value for now
+    # FIXME: qvm-run --pass-io seems to only pass to stderr, set both colours to the same value for now
     # the command has quotes, it works for all -c parameters that I know of
     _command = 'qvm-run --autostart --user {} --colour-output {} --colour-stderr {} --pass-io {} \"{}\"'.format(
         user, colour, err_colour, target, command)
@@ -162,14 +162,14 @@ class QsmDomainAlreadyExistError(Exception):
     pass
 
 
-class QsmDomainIsNotATemplate(Exception):
+class QsmDomainIsNotATemplateError(Exception):
     """
     Raised when a domain is not a template, but should be.
     """
     pass
 
 
-class QsmDomainATemplate(Exception):
+class QsmDomainIsATemplateError(Exception):
     """
     Raised when a domain is a template, but it shouldn't be.
     """

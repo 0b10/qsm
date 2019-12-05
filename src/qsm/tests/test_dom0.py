@@ -569,3 +569,58 @@ def test__firewall__proto__happy_path(value):
     with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
         with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
             dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto=value) is None
+
+
+# >>> is_template() >>>
+# ~~~ is_template ~~~
+def test__is_template__true():
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        assert dom0.is_template("test-template") is True
+
+
+def test__is_template__false():
+    with patch("qsm.dom0.lib.run", side_effect=lib.QsmProcessError(1), autospec=True):
+        assert dom0.is_template("test-template") is False
+
+
+# ~~~ is_template_or_throws ~~~
+def test__is_template_or_throws__true():
+    with patch("qsm.dom0.exists_or_throws", return_value=None, autospec=True):
+        with patch("qsm.dom0.is_template", return_value=True, autospec=True):
+            assert dom0.is_template_or_throws("test-template") is True
+
+
+def test__is_template_or_throws__throws_when_vm_exists():
+    """Test that it throws when the vm exists, but is not a template."""
+    with patch("qsm.dom0.exists_or_throws", return_value=None, autospec=True):
+        with patch("qsm.dom0.is_template", return_value=False, autospec=True):
+            with pytest.raises(lib.QsmDomainIsNotATemplateError):
+                dom0.is_template_or_throws("test-template")
+
+
+def test__is_template_or_throws__throws_when_vm_not_exists():
+    """Test that it throws when the vm does not exists"""
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
+        with pytest.raises(lib.QsmDomainDoesntExistError):
+            dom0.is_template_or_throws("test-template")
+
+
+# ~~~ is_not_template_or_throws ~~~
+def test__is_not_template_or_throws__true():
+    """Test that a non-template is detected, but it's existence isn't evaluated"""
+    with patch("qsm.dom0.is_template", return_value=False, autospec=True):
+        assert dom0.is_not_template_or_throws("test-template", must_exist=False) is True
+
+
+def test__is_not_template_or_throws__throws_when_domain_doesnt_exists():
+    """Test that it throws when the domain doesn't exists at all"""
+    with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
+        with pytest.raises(lib.QsmDomainDoesntExistError):
+            dom0.is_not_template_or_throws("test-template", must_exist=True)
+
+
+def test__is_not_template_or_throws__passes_when_exists():
+    """Test that it passes when the domain exists, and is a template."""
+    with patch("qsm.dom0.exists_or_throws", return_value=None, autospec=True):
+        with patch("qsm.dom0.is_template", return_value=False, autospec=True):
+            assert dom0.is_not_template_or_throws("test-template", must_exist=True) is True

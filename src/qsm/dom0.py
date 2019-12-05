@@ -122,7 +122,7 @@ def is_template_or_throws(target):
     if not is_template(target):
         message = "{} is not a template".format(target)
         lib.print_sub(message, failed=True)
-        raise lib.QsmDomainIsNotATemplate(message)
+        raise lib.QsmDomainIsNotATemplateError(message)
     return True
 
 
@@ -135,7 +135,7 @@ def is_not_template_or_throws(target, must_exist=False):
 
     message = "{} is a template".format(target)
     lib.print_sub(message, failed=True)
-    raise lib.QsmDomainIsATemplate(message)
+    raise lib.QsmDomainIsATemplateError(message)
 
 
 # >>> DOMAIN PROVISIONING >>>
