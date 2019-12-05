@@ -237,7 +237,7 @@ def firewall(target, action, dsthost, dstports, icmptype=None, proto="tcp"):
     _command = "qvm-firewall {0} add action={1} dsthost={2} proto={3}"\
         .format(target, action, dsthost, proto)
 
-    if icmptype:
+    if icmptype is not None:
         assert type(icmptype) is int and 0 <= icmptype <= 43, \
             "icmptype must be an integer, 0 <= n <= 43: {}".format(icmptype)
         assert proto == \

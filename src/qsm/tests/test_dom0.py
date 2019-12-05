@@ -25,6 +25,8 @@ from unittest.mock import patch, MagicMock
 import pytest
 from qsm.constants import QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING
 import re
+import hypothesis
+from hypothesis import strategies as s
 
 
 # >>> exists() >>>
@@ -409,8 +411,6 @@ def test_create_vm_jobs_are_called(mock_create, mock_clone, mock_vm_prefs, mock_
 
 
 # >>> firewall() >>>
-
-
 @pytest.mark.parametrize("do,expected", [
     # func | expected
     # action=accept
@@ -433,11 +433,26 @@ def test_create_vm_jobs_are_called(mock_create, mock_clone, mock_vm_prefs, mock_
         lambda: dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="icmp"),
         "qvm-firewall test-vm add action=accept dsthost=192.168.1.1 proto=icmp"
     ),
-    # # dsthost= /16
-    # (
-    #     lambda: dom0.firewall("test-vm", "accept", "192.168.1.1/16", "1", proto="tcp"),
-    #     "qvm-firewall test-vm add action=accept dsthost=192.168.1.1/16 proto=tcp"
-    # ),
+    # dsthost= (ipv4)/16
+    (
+        lambda: dom0.firewall("test-vm", "accept", "192.168.1.1/16", "1", proto="tcp"),
+        "qvm-firewall test-vm add action=accept dsthost=192.168.1.1/16 proto=tcp"
+    ),
+    # dsthost = (ipv6)
+    (
+        lambda: dom0.firewall("test-vm", "accept", "4eeb:ac6d:1f62:f2c5:b84c:851a:bdac:9d0a", "1"),
+        "qvm-firewall test-vm add action=accept dsthost=4eeb:ac6d:1f62:f2c5:b84c:851a:bdac:9d0a proto=tcp"
+    ),
+    # dsthost = (ipv6)/124
+    (
+        lambda: dom0.firewall("test-vm", "accept", "4eeb:ac6d:1f62:f2c5:b84c:851a:bdac:9d0a/124", "1"),
+        "qvm-firewall test-vm add action=accept dsthost=4eeb:ac6d:1f62:f2c5:b84c:851a:bdac:9d0a/124 proto=tcp"
+    ),
+    # icmptype
+    (
+        lambda: dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="icmp", icmptype=0),
+        "qvm-firewall test-vm add action=accept dsthost=192.168.1.1 proto=icmp icmptype=0"
+    ),
 ])
 def test__firewall__happy_path(do, expected):
     with patch("qsm.dom0.lib.run", return_value=None, autospec=True) as mock_run:
@@ -445,3 +460,112 @@ def test__firewall__happy_path(do, expected):
             do()
             assert re.search(expected, str(mock_run.call_args)), \
                 "run was not called with expected args -- should be: {}".format(expected)
+
+
+# ~~~ action ~~~
+@hypothesis.given(s.one_of(s.integers(), s.text(), s.functions()))
+def test__firewall__action__fuzz_negative(value):
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", value, "192.168.1.1", "1")
+
+
+# ~~~ dsthost ~~~
+@hypothesis.given(s.one_of(s.integers(), s.text(), s.functions()))
+def test__firewall__dsthost__fuzz_negative(value):
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", value, "1")
+
+
+# ~~~ dst ports ~~~
+@hypothesis.given(s.one_of(s.floats(), s.text(), s.functions()))
+def test__firewall__dstports__invalid_type_fuzz_negative(value):
+    """Test random types cause assertion error"""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", value)
+
+
+@hypothesis.given(s.integers(min_value=1, max_value=65535))
+def test__firewall__dstports__fuzz_positive(value):
+    """Test values inside of the acceptable range of ports"""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            assert dom0.firewall("test-vm", "accept", "192.168.1.1", str(value)) is None, \
+                "{} should be accepted as a valid port".format(value)
+
+
+@hypothesis.given(
+    s.one_of(s.integers(min_value=65536, max_value=100000), s.integers(min_value=-100000, max_value=0)))
+def test__firewall__dstports__fuzz_unacceptable_ints(value):
+    """Test values outside of the acceptable range of ports."""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", str(value))
+
+
+# ~~~ target ~~~
+def test__firewall__target_doesnt_exist():
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", side_effect=lib.QsmDomainDoesntExistError, autospec=True):
+            with pytest.raises(lib.QsmDomainDoesntExistError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", "1")
+
+
+# ~~~ imcptype ~~~
+@hypothesis.given(s.integers(min_value=0, max_value=43))
+def test__firewall__icmptype__happy_fuzz(value):
+    """Test values inside of the acceptable range of icmp types."""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            assert dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="icmp", icmptype=value) is None
+
+
+@hypothesis.given(
+    s.one_of(s.integers(min_value=-100, max_value=-1), s.integers(min_value=44, max_value=100)))
+def test__firewall__icmptype__nagative_fuzz(value):
+    """Test values outside of the acceptable range of icmp types."""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="icmp", icmptype=value)
+
+
+@hypothesis.given(s.one_of(s.text(), s.lists(s.integers()), s.booleans(), s.floats()))
+def test__firewall__icmptype__invalid_type_nagative_fuzz(value):
+    """Test non-integer types for icmptype - should throw."""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="icmp", icmptype=value)
+
+
+def test__firewall__icmptype__proto_set_icmptype_is_used():
+    """Test that proto must be icmp is icmptype is set"""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto="tcp", icmptype=0)
+
+
+# ~~~ proto ~~~
+@hypothesis.given(s.one_of(s.text(), s.lists(s.integers()), s.booleans(), s.floats()))
+def test__firewall__proto__invalid_type_nagative_fuzz(value):
+    """Test invalid, unconstrained values for proto - should throw."""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            with pytest.raises(AssertionError):
+                dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto=value)
+
+
+@pytest.mark.parametrize("value", ["tcp", "udp", "icmp"])
+def test__firewall__proto__happy_path(value):
+    """Test valid, constrained values for proto"""
+    with patch("qsm.dom0.lib.run", return_value=None, autospec=True):
+        with patch("qsm.dom0.exists_or_throws", return_value=True, autospec=True):
+            dom0.firewall("test-vm", "accept", "192.168.1.1", "1", proto=value) is None

@@ -133,6 +133,13 @@ def test__is_ip__not_net__negative():
             "should return False for {}".format(ip)
 
 
+@hypothesis.given(s.one_of(s.text(), s.booleans(), s.integers(), s.floats(), s.lists(s.integers())))
+def test__is_ip__invalid_type__negative_fuzz(value):
+    """Tests random types. IP addresses must be strings."""
+    assert not lib.is_ip(value), \
+        "should return False for {}".format(value)
+
+
 @pytest.mark.parametrize("value", [
     "1",
     "1,2",

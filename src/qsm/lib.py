@@ -85,9 +85,12 @@ def is_meaningful_string(value):
 
 
 def is_ip(value, network=True):
+    if not isinstance(value, str):
+        return False
+
     try:
         if network:
-            ipaddress.ip_network(value)
+            ipaddress.ip_network(value, strict=False)
         else:
             ipaddress.ip_address(value)
     except (ipaddress.AddressValueError, ValueError):
@@ -101,9 +104,9 @@ def is_mac(value):
 
 
 def assert_valid_dstports(value):
-    assert type(value), "dstports must be a string: {}".format(value)
+    assert isinstance(value, str), "dstports must be a string: {}".format(value)
     assert re.search("^[-,0-9]+$", value), \
-        "invalid chars found for dstports - use - , or integers only: {}"
+        "invalid chars found for dstports - use '-' ',' or integers only: {}"
     ports = value.replace("-", ",").split(",")
 
     try:
@@ -111,7 +114,7 @@ def assert_valid_dstports(value):
             "dstport value must be between 1 - 65535: {}".format(value)
     except ValueError:
         raise AssertionError(
-            "an incastable value exists in dstports: {}".format(value))
+            "an uncastable (non-int like) value exists in dstports: {}".format(value))
     return True
 
 
