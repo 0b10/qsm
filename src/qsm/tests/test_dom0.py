@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from qsm import dom0, lib
+from qsm import dom0, lib, vm
 from unittest.mock import patch, MagicMock
 import pytest
 from qsm.constants import QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING
@@ -629,16 +629,165 @@ def test__is_not_template_or_throws__passes_when_exists():
 # >>> create_template() >>>
 @patch("qsm.dom0.not_exists_or_throws", return_value=None, autospace=True)
 @patch("qsm.dom0.exists", return_value=True, autospace=True)  # source_template
+@patch("qsm.dom0.install", return_value=None, autospace=True)  # source_template
+@patch("qsm.dom0.is_template_or_throws", return_value=True, autospace=True)
+@patch("qsm.dom0.clone", return_value=None, autospace=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospace=True)
+def test__create_template__exists__happy_path(mock_vm_prefs, mock_clone, _, mock_dom0_install, __, ___):
+    """Test that when a source template exists, that it is used."""
+    # limit mock checks to install and clone
+    assert dom0.create_template(
+        "target-template",
+        "source-template",
+        prefs=None,
+        jobs=None,
+        update=False,
+        packages_file_path=None,
+        shutdown=False
+    ) is None
+
+    assert mock_clone.called is True, "clone was not called"
+    assert mock_dom0_install.called is False, "the template was installed in the vm, via the package manager"
+
+
+@patch("qsm.dom0.not_exists_or_throws", return_value=None, autospace=True)
+@patch("qsm.dom0.exists", return_value=False, autospace=True)  # source_template
+@patch("qsm.dom0.install", return_value=None, autospace=True)  # source_template
+@patch("qsm.dom0.clone", return_value=None, autospace=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospace=True)
+def test__create_template__not_exists__happy_path(mock_vm_prefs, mock_clone, mock_dom0_install, ___, ____):
+    """Test that when a source template doesn't exist, it is installed into dom0"""
+    assert dom0.create_template(
+        "target-template",
+        "source-template",
+        prefs=None,
+        jobs=None,
+        update=False,
+        packages_file_path=None,
+        shutdown=False
+    ) is None
+
+    assert mock_clone.called is True, "clone was not called"
+    assert mock_dom0_install.called is True, "the template was not installed via the package manager"
+
+
+@patch("qsm.dom0.read_packages_file", return_value="pkg1 pkg2", autospace=True)
+@patch("qsm.dom0.not_exists_or_throws", return_value=None, autospace=True)
+@patch("qsm.dom0.exists", return_value=True, autospace=True)  # source_template
+@patch("qsm.dom0.install", return_value=None, autospace=True)  # source_template
 @patch("qsm.dom0.is_template_or_throws", return_value=True, autospace=True)
 @patch("qsm.dom0.clone", return_value=None, autospace=True)
 @patch("qsm.dom0.vm_prefs", return_value=None, autospace=True)
 @patch("qsm.vm.update", return_value=None, autospace=True)
 @patch("qsm.vm.install", return_value=None, autospace=True)
 @patch("qsm.dom0.stop", return_value=None, autospace=True)
-def test__create_template__happy_path(mock_stop, mock_install, mock_update, mock_vm_prefs, mock_clone, __, ___, ____):
-    assert dom0.create_template("target-template", "source-template", update=False, shutdown=False) is None
-    assert mock_clone.called is True, "clone was not called"
+def test__create_template__all_optional_args_set__happy_path(
+        mock_stop, mock_vm_install, mock_update, mock_vm_prefs, _, __,  ___, ____, _____, ______):
+    """Test that all the optional args set, has expected results"""
+    fake_prefs = vm.VmPrefsBuilder().qrexec_timeout(110)
+    mock_job_1 = MagicMock()
+    mock_job_2 = MagicMock()
+    fake_jobs = [lambda: mock_job_1(), lambda: mock_job_2()]
+
+    assert dom0.create_template(
+        "target-template",
+        "source-template",
+        prefs=fake_prefs,  # user defined prefs should be set (on top of other, automatic/internally set prefs)
+        jobs=fake_jobs,  # fake jobs should be run
+        update=True,  # the target should update
+        packages_file_path="/fake/path",  # packages should be installed into target
+        shutdown=True  # shutdown should occur
+    ) is None
+
+    assert mock_update.called is True, "the vm was not updated"
+    assert mock_vm_install.called is True, "packages were not installed in the vm"
+    assert mock_stop.called is True, "stop was not called"
+    mock_vm_prefs.assert_any_call("target-template", fake_prefs)  # user defined prefs not set on target
+    assert mock_job_1.called, "job 1 wasn't called"
+    assert mock_job_2.called, "job 2 wasn't called"
+
+
+@patch("qsm.dom0.read_packages_file", return_value="pkg1 pkg2", autospace=True)
+@patch("qsm.dom0.not_exists_or_throws", return_value=None, autospace=True)
+@patch("qsm.dom0.exists", return_value=True, autospace=True)  # source_template
+@patch("qsm.dom0.install", return_value=None, autospace=True)  # source_template
+@patch("qsm.dom0.is_template_or_throws", return_value=True, autospace=True)
+@patch("qsm.dom0.clone", return_value=None, autospace=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospace=True)
+@patch("qsm.vm.update", return_value=None, autospace=True)
+@patch("qsm.vm.install", return_value=None, autospace=True)
+@patch("qsm.dom0.stop", return_value=None, autospace=True)
+def test__create_template__all_optional_args_unset__happy_path(
+        mock_stop, mock_vm_install, mock_update, mock_vm_prefs, _, __,  ___, ____, _____, ______):
+    """
+    Test that when all the optional args are set in such a way that causes no related side-effects, that
+    such side-effects do not occur - in other words: if args are unset, don't do those jobs
+    """
+
+    assert dom0.create_template(
+        "target-template",
+        "source-template",
+        prefs=None,  # user-defined prefs should not be set, but labels etc are set automatically
+        jobs=None,  # no jobs should be run
+        update=False,  # the vm should not update
+        packages_file_path=None,  # no packages should be installed
+        shutdown=False  # stop should not occur
+    ) is None
+
     assert mock_update.called is False, "the vm was updated"
-    assert mock_install.called is False, "packages were installed in the vm"
-    assert mock_stop.called is False, "the vm was stopped"
-    assert mock_vm_prefs.call_count == 1, "prefs should have been called only once (to set the vm label)"
+    assert mock_vm_install.called is False, "packages were installed in the vm"
+    assert mock_stop.called is False, "stop was called"
+
+    try:
+        fake_prefs = vm.VmPrefsBuilder().qrexec_timeout(110)
+        mock_vm_prefs.assert_any_call("target-template", fake_prefs)  # user defined prefs not set on target
+        pytest.fail("user defined prefs were set, even though none were passed in")
+    except AssertionError:
+        pass
+
+
+@patch("qsm.dom0.not_exists_or_throws", side_effect=lib.QsmDomainAlreadyExistError, autospace=True)
+def test__create_template__target_exists__negative(_):
+    """Test that if the target already exists, it throws."""
+    # limit mock checks to install and clone
+    with pytest.raises(lib.QsmDomainAlreadyExistError):
+        dom0.create_template(
+            "target-template",
+            "source-template",
+            prefs=None,
+            jobs=None,
+            update=False,
+            packages_file_path=None,
+            shutdown=False
+        )
+
+
+@patch("qsm.dom0.not_exists_or_throws", return_value=None, autospace=True)
+@patch("qsm.dom0.exists", return_value=True, autospace=True)  # source_template
+@patch("qsm.dom0.is_template_or_throws", side_effect=lib.QsmDomainIsNotATemplateError, autospace=True)
+def test__create_template__source_is_not_template__negative(_, __, ___):
+    """Test that when the source is not a template, it raises."""
+    with pytest.raises(lib.QsmDomainIsNotATemplateError):
+        dom0.create_template(
+            "target-template",
+            "source-template",
+            prefs=None,
+            jobs=None,
+            update=False,
+            packages_file_path=None,
+            shutdown=False
+        )
+
+
+def test__create_template__source_and_target_same_names():
+    """Test that when the source and target names cannot be the same."""
+    with pytest.raises(AssertionError):
+        dom0.create_template(
+            "name",
+            "name",
+            prefs=None,
+            jobs=None,
+            update=False,
+            packages_file_path=None,
+            shutdown=False
+        )
