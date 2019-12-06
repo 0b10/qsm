@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from qsm import lib, constants, vm
+from qsm import lib, constants, vm, config
 import types
 import os
 import sys
@@ -348,14 +348,9 @@ def create_vm(name, label, clone_from=None, prefs=None, services=None, jobs=None
             job()
 
 
-# TODO: make a config object
-config = {}
-config["data_dir"] = "/tmp/test"
-
-
-def read_packages_file(rel_path):
+def read_packages_file(rel_path, data_dir=config.get("data_dir")):
     assert rel_path and isinstance(rel_path, str), "rel_path must be a non-empty string"
-    _path = os.path.join(config.data_dir, rel_path)
+    _path = os.path.join(data_dir, rel_path)
     with open(_path, "r", encoding="utf8") as f:
         try:
             return f.read().replace("\n", " ").strip()  # make space separated values

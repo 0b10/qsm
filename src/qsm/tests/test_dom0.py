@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from qsm import dom0, lib, vm
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 import pytest
 from qsm.constants import QVM_CHECK_EXISTS_NOT_FOUND, QVM_CHECK_IS_NOT_RUNNING
 import re
@@ -791,3 +791,11 @@ def test__create_template__source_and_target_same_names():
             packages_file_path=None,
             shutdown=False
         )
+
+
+# >>> read_packages_file() >>>
+def test__read_packages_file__returns_expected_string(tmp_path):
+    fake_data_dir = str(tmp_path / ".qsm" / "data")
+    with patch("builtins.open", mock_open(read_data=" pkg1\npkg2\n ")):
+        assert dom0.read_packages_file("arbitrary-name", data_dir=fake_data_dir) == "pkg1 pkg2", \
+            "the returned value should be a single line, space separated string of packages"
