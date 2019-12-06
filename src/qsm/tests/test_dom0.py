@@ -624,3 +624,21 @@ def test__is_not_template_or_throws__passes_when_exists():
     with patch("qsm.dom0.exists_or_throws", return_value=None, autospec=True):
         with patch("qsm.dom0.is_template", return_value=False, autospec=True):
             assert dom0.is_not_template_or_throws("test-template", must_exist=True) is True
+
+
+# >>> create_template() >>>
+@patch("qsm.dom0.not_exists_or_throws", return_value=None, autospace=True)
+@patch("qsm.dom0.exists", return_value=True, autospace=True)  # source_template
+@patch("qsm.dom0.is_template_or_throws", return_value=True, autospace=True)
+@patch("qsm.dom0.clone", return_value=None, autospace=True)
+@patch("qsm.dom0.vm_prefs", return_value=None, autospace=True)
+@patch("qsm.vm.update", return_value=None, autospace=True)
+@patch("qsm.vm.install", return_value=None, autospace=True)
+@patch("qsm.dom0.stop", return_value=None, autospace=True)
+def test__create_template__happy_path(mock_stop, mock_install, mock_update, mock_vm_prefs, mock_clone, __, ___, ____):
+    assert dom0.create_template("target-template", "source-template", update=False, shutdown=False) is None
+    assert mock_clone.called is True, "clone was not called"
+    assert mock_update.called is False, "the vm was updated"
+    assert mock_install.called is False, "packages were installed in the vm"
+    assert mock_stop.called is False, "the vm was stopped"
+    assert mock_vm_prefs.call_count == 1, "prefs should have been called only once (to set the vm label)"
