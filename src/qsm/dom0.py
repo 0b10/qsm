@@ -24,6 +24,7 @@ from qsm import lib, constants, vm
 import types
 import os
 import sys
+import getpass
 
 
 # >>> PREDICATES >>>
@@ -32,7 +33,7 @@ def exists(target):
     _command = "qvm-check --quiet {} 2>/dev/null".format(target)
     try:
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
     except lib.QsmProcessError as error:
         if error.returncode != constants.QVM_CHECK_EXISTS_NOT_FOUND:  # is not exit code 2
             # some other error occurred
@@ -70,7 +71,7 @@ def is_running(target):
         target)
     try:
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
     except lib.QsmProcessError as error:
         if error.returncode != constants.QVM_CHECK_IS_NOT_RUNNING:  # is not exit code 1
             # some other error occurred
@@ -112,7 +113,7 @@ def is_template(target):
 
     try:
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
     except lib.QsmProcessError as error:
         if error.returncode != constants.QVM_CHECK_DOMAIN_IS_A_TEMPLATE:  # is not exit code 0
             return False
@@ -150,7 +151,7 @@ def create(name, label, options="", exists_ok=True):
     if exists_ok:
         try:
             lib.run(command=_command, target="dom0",
-                    user="root", show_message=False)
+                    user=getpass.getuser(), show_message=False)
         except lib.QsmProcessError as error:
             if error.returncode != constants.QVM_CREATE_DOMAIN_ALREADY_EXISTS:  # is not exit code 1
                 # some other error occurred
@@ -160,7 +161,7 @@ def create(name, label, options="", exists_ok=True):
     else:
         not_exists_or_throws(name)
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
 
     lib.print_sub("{} creation finished".format(name))
 
@@ -174,7 +175,7 @@ def vm_prefs(target, prefs):
     for _key, _value in prefs.items():
         _command = "qvm-prefs -s {} {} \'{}\'".format(target, _key, _value)
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
 
         lib.print_sub("{}: {}".format(_key, _value))
 
@@ -184,7 +185,7 @@ def start(target):
     exists_or_throws(target)
 
     _command = "qvm-start --skip-if-running {}".format(target)
-    lib.run(command=_command, target="dom0", user="root", show_message=False)
+    lib.run(command=_command, target="dom0", user=getpass.getuser(), show_message=False)
 
     lib.print_sub("{} started".format(target))
 
@@ -197,7 +198,7 @@ def stop(target, timeout=120):
         _command = "qvm-shutdown --wait --timeout {} {}".format(
             timeout, target)
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
 
         lib.print_sub("{} stopped".format(target))
         return
@@ -215,7 +216,7 @@ def remove(target, shutdown_ok=False):
         else:
             is_stopped_or_throws(target)
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
 
         lib.print_sub("{} removal finished".format(target))
         return
@@ -229,7 +230,7 @@ def clone(source, target):
     not_exists_or_throws(target)
 
     _command = "qvm-clone --quiet {} {} 2>/dev/null".format(source, target)
-    lib.run(command=_command, target="dom0", user="root", show_message=False)
+    lib.run(command=_command, target="dom0", user=getpass.getuser(), show_message=False)
 
     lib.print_sub("{} created".format(target))
 
@@ -243,7 +244,7 @@ def enable_services(target, services):
     for _service in services:
         _command = "qvm-service --enable {} {}".format(target, _service)
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
 
         lib.print_sub("{}".format(_service))
 
@@ -258,7 +259,7 @@ def disable_services(target, services):
         _command = "qvm-service --disable {} {}".format(
             target, _service, show_message=False)
         lib.run(command=_command, target="dom0",
-                user="root", show_message=False)
+                user=getpass.getuser(), show_message=False)
 
         lib.print_sub("{}".format(_service))
 
